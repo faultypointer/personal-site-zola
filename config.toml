@@ -2,7 +2,7 @@
 #================ Docs: https://github.com/isunjn/serene/wiki ============================
 #=========================================================================================
 
-base_url = "https://example.com" # The domain of your site
+base_url = "https://faultypointer.netlify.app" # The domain of your site
 title = "FaultyPointer"
 description = "My personal website"
 default_language = "en"
