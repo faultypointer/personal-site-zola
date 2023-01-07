@@ -7,12 +7,25 @@
         <loc>https://example.com/blog/</loc>
     </url>
     <url>
+        <loc>https://example.com/blog/you-can-never-forget-your-first/</loc>
+        <lastmod>2023-01-07</lastmod>
+    </url>
+    <url>
         <loc>https://example.com/categories/</loc>
+    </url>
+    <url>
+        <loc>https://example.com/categories/rant/</loc>
     </url>
     <url>
         <loc>https://example.com/projects/</loc>
     </url>
     <url>
         <loc>https://example.com/tags/</loc>
+    </url>
+    <url>
+        <loc>https://example.com/tags/first-programming-language/</loc>
+    </url>
+    <url>
+        <loc>https://example.com/tags/python/</loc>
     </url>
 </urlset>

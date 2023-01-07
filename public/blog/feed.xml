@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+	<title>FaultyPointer</title>
+	<subtitle>My blog page</subtitle>
+	<link href="https://example.com/blog/feed.xml" rel="self" type="application/atom+xml"/>
+    <link href="https://example.com/blog/"/>
+	<updated>2023-01-07T00:00:00+00:00</updated>
+	<id>https://example.com/blog/feed.xml</id>
+	<entry xml:lang="en">
+		<title>You can never forget your first</title>
+		<published>2023-01-07T00:00:00+00:00</published>
+		<updated>2023-01-07T00:00:00+00:00</updated>
+        <summary>&lt;h2 id=&quot;what-the-hell-am-i-even-taking-about&quot;&gt;What the hell am I even taking about?&lt;&#x2F;h2&gt;
+&lt;p&gt;Well, the title may be true for most things, but I am obviously taking about se- &lt;em&gt;ahem&lt;&#x2F;em&gt; programming language.  My first programming language was &lt;a rel=&quot;nofollow noreferrer&quot; href=&quot;https:&#x2F;&#x2F;www.python.org&#x2F;&quot;&gt;python&lt;&#x2F;a&gt; which is why I may be feeling like this because I haven&#x27;t made anything groundbreaking in &lt;span title=&quot;or any other language for that matter...&quot;&gt;python&lt;&#x2F;span&gt;.&lt;&#x2F;p&gt;
+</summary>
+		<link href="https://example.com/blog/you-can-never-forget-your-first/" type="text/html"/>
+		<id>https://example.com/blog/you-can-never-forget-your-first/</id>
+		<content type="html">&lt;h2 id=&quot;what-the-hell-am-i-even-taking-about&quot;&gt;What the hell am I even taking about?&lt;&#x2F;h2&gt;
+&lt;p&gt;Well, the title may be true for most things, but I am obviously taking about se- &lt;em&gt;ahem&lt;&#x2F;em&gt; programming language.  My first programming language was &lt;a rel=&quot;nofollow noreferrer&quot; href=&quot;https:&#x2F;&#x2F;www.python.org&#x2F;&quot;&gt;python&lt;&#x2F;a&gt; which is why I may be feeling like this because I haven&#x27;t made anything groundbreaking in &lt;span title=&quot;or any other language for that matter...&quot;&gt;python&lt;&#x2F;span&gt;.&lt;&#x2F;p&gt;
+&lt;span id=&quot;continue-reading&quot;&gt;&lt;&#x2F;span&gt;&lt;h2 id=&quot;a-little-about-python&quot;&gt;A little about python&lt;&#x2F;h2&gt;
+&lt;p&gt;For those small percentage of people who didn&#x27;t know about python, I mean really, python is a really simple programming language that even you could learn it. I am not kidding, just &lt;a rel=&quot;nofollow noreferrer&quot; href=&quot;https:&#x2F;&#x2F;learnxinyminutes.com&#x2F;docs&#x2F;python&#x2F;&quot;&gt;try it.&lt;&#x2F;a&gt; But it is also very powerful that it is used in machine learning and data science among most other fields. &lt;&#x2F;p&gt;
+&lt;h2 id=&quot;my-first-step-into-programming&quot;&gt;My first step into programming&lt;&#x2F;h2&gt;
+&lt;p&gt;I will keep it short. As you read before, Python was my first programming language. I learned it from a &lt;a rel=&quot;nofollow noreferrer&quot; href=&quot;https:&#x2F;&#x2F;www.mikedane.com&#x2F;&quot;&gt;Mike Dane&lt;&#x2F;a&gt; video on &lt;a rel=&quot;nofollow noreferrer&quot; href=&quot;https:&#x2F;&#x2F;www.youtube.com&#x2F;@freecodecamp&quot;&gt;freeCodeCamp&lt;&#x2F;a&gt;&#x27;s YouTube channel. It was an excellent video. So I got into python and did some programming problems on leetcode, coding war etc. like websites. My first solid project as a beginner is a GUI quiz application using pyqt. Then I did a very simple Conway&#x27;s game of life program. After that, I did some of this and that and then came c, c++, a bit of c#, rust, and some others. Maybe I&#x27;ll write about all that in another post.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;so-why-am-i-writing-this&quot;&gt;So why am I writing this?&lt;&#x2F;h2&gt;
+&lt;p&gt;I haven&#x27;t done much of python coding for past few months or maybe even a year. But few weeks ago, There was a live coding competition as an event in “Tech Fest” organized by a club in my college which I took part in. I decided to do that in python because why not? After that, all my best times with python began to come into my mind. I also remember how I used 52 elif to make a Caesar cypher. &lt;&#x2F;p&gt;
+&lt;h2 id=&quot;idk-what-to-put-here&quot;&gt;IDK what to put here&lt;&#x2F;h2&gt;
+&lt;p&gt;If I keep thinking about what to write more I will just end up abandoning this like most of my project. So I guess this is it for my first blog. Do learn python though, it&#x27;s really easy. &lt;&#x2F;p&gt;
+</content>
+	</entry>
+</feed>
