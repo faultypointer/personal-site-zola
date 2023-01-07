@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://example.com/</loc>
+        <loc>https://faultypointer.netlify.app/</loc>
     </url>
     <url>
-        <loc>https://example.com/blog/</loc>
+        <loc>https://faultypointer.netlify.app/blog/</loc>
     </url>
     <url>
-        <loc>https://example.com/blog/you-can-never-forget-your-first/</loc>
+        <loc>https://faultypointer.netlify.app/blog/you-can-never-forget-your-first/</loc>
         <lastmod>2023-01-07</lastmod>
     </url>
     <url>
-        <loc>https://example.com/categories/</loc>
+        <loc>https://faultypointer.netlify.app/categories/</loc>
     </url>
     <url>
-        <loc>https://example.com/categories/rant/</loc>
+        <loc>https://faultypointer.netlify.app/categories/rant/</loc>
     </url>
     <url>
-        <loc>https://example.com/projects/</loc>
+        <loc>https://faultypointer.netlify.app/projects/</loc>
     </url>
     <url>
-        <loc>https://example.com/tags/</loc>
+        <loc>https://faultypointer.netlify.app/tags/</loc>
     </url>
     <url>
-        <loc>https://example.com/tags/first-programming-language/</loc>
+        <loc>https://faultypointer.netlify.app/tags/first-programming-language/</loc>
     </url>
     <url>
-        <loc>https://example.com/tags/python/</loc>
+        <loc>https://faultypointer.netlify.app/tags/python/</loc>
     </url>
 </urlset>

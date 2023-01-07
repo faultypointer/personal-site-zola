@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
 	<title>FaultyPointer</title>
 	<subtitle>My blog page</subtitle>
-	<link href="https://example.com/blog/feed.xml" rel="self" type="application/atom+xml"/>
-    <link href="https://example.com/blog/"/>
+	<link href="https://faultypointer.netlify.app/blog/feed.xml" rel="self" type="application/atom+xml"/>
+    <link href="https://faultypointer.netlify.app/blog/"/>
 	<updated>2023-01-07T00:00:00+00:00</updated>
-	<id>https://example.com/blog/feed.xml</id>
+	<id>https://faultypointer.netlify.app/blog/feed.xml</id>
 	<entry xml:lang="en">
 		<title>You can never forget your first</title>
 		<published>2023-01-07T00:00:00+00:00</published>
@@ -13,8 +13,8 @@
         <summary>&lt;h2 id=&quot;what-the-hell-am-i-even-taking-about&quot;&gt;What the hell am I even taking about?&lt;&#x2F;h2&gt;
 &lt;p&gt;Well, the title may be true for most things, but I am obviously taking about se- &lt;em&gt;ahem&lt;&#x2F;em&gt; programming language.  My first programming language was &lt;a rel=&quot;nofollow noreferrer&quot; href=&quot;https:&#x2F;&#x2F;www.python.org&#x2F;&quot;&gt;python&lt;&#x2F;a&gt; which is why I may be feeling like this because I haven&#x27;t made anything groundbreaking in &lt;span title=&quot;or any other language for that matter...&quot;&gt;python&lt;&#x2F;span&gt;.&lt;&#x2F;p&gt;
 </summary>
-		<link href="https://example.com/blog/you-can-never-forget-your-first/" type="text/html"/>
-		<id>https://example.com/blog/you-can-never-forget-your-first/</id>
+		<link href="https://faultypointer.netlify.app/blog/you-can-never-forget-your-first/" type="text/html"/>
+		<id>https://faultypointer.netlify.app/blog/you-can-never-forget-your-first/</id>
 		<content type="html">&lt;h2 id=&quot;what-the-hell-am-i-even-taking-about&quot;&gt;What the hell am I even taking about?&lt;&#x2F;h2&gt;
 &lt;p&gt;Well, the title may be true for most things, but I am obviously taking about se- &lt;em&gt;ahem&lt;&#x2F;em&gt; programming language.  My first programming language was &lt;a rel=&quot;nofollow noreferrer&quot; href=&quot;https:&#x2F;&#x2F;www.python.org&#x2F;&quot;&gt;python&lt;&#x2F;a&gt; which is why I may be feeling like this because I haven&#x27;t made anything groundbreaking in &lt;span title=&quot;or any other language for that matter...&quot;&gt;python&lt;&#x2F;span&gt;.&lt;&#x2F;p&gt;
 &lt;span id=&quot;continue-reading&quot;&gt;&lt;&#x2F;span&gt;&lt;h2 id=&quot;a-little-about-python&quot;&gt;A little about python&lt;&#x2F;h2&gt;
