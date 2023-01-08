@@ -4,8 +4,27 @@
 	<subtitle>My blog page</subtitle>
 	<link href="https://faultypointer.netlify.app/blog/feed.xml" rel="self" type="application/atom+xml"/>
     <link href="https://faultypointer.netlify.app/blog/"/>
-	<updated>2023-01-07T00:00:00+00:00</updated>
+	<updated>2023-01-08T00:00:00+00:00</updated>
 	<id>https://faultypointer.netlify.app/blog/feed.xml</id>
+	<entry xml:lang="en">
+		<title>Introduction</title>
+		<published>2023-01-08T00:00:00+00:00</published>
+		<updated>2023-01-08T00:00:00+00:00</updated>
+        <summary>&lt;h2 id=&quot;what-is-a-bite-of&quot;&gt;What is A Bite Of?&lt;&#x2F;h2&gt;
+&lt;p&gt;It&#x27;s a series of blogs where I try to explain very little about a topic I have no deep or maybe not even an intermediate understanding of.
+For example, I may try to explain about &lt;a href=&quot;.&#x2F;a_bite_of_markov_chain.md&quot;&gt;Markov Chain&lt;&#x2F;a&gt; which I clearly don&#x27;t have adequate knowledge of.&lt;&#x2F;p&gt;
+</summary>
+		<link href="https://faultypointer.netlify.app/blog/a-bite-of-intro/" type="text/html"/>
+		<id>https://faultypointer.netlify.app/blog/a-bite-of-intro/</id>
+		<content type="html">&lt;h2 id=&quot;what-is-a-bite-of&quot;&gt;What is A Bite Of?&lt;&#x2F;h2&gt;
+&lt;p&gt;It&#x27;s a series of blogs where I try to explain very little about a topic I have no deep or maybe not even an intermediate understanding of.
+For example, I may try to explain about &lt;a href=&quot;.&#x2F;a_bite_of_markov_chain.md&quot;&gt;Markov Chain&lt;&#x2F;a&gt; which I clearly don&#x27;t have adequate knowledge of.&lt;&#x2F;p&gt;
+&lt;span id=&quot;continue-reading&quot;&gt;&lt;&#x2F;span&gt;&lt;h2 id=&quot;why-am-i-doing-this&quot;&gt;Why am I doing this?&lt;&#x2F;h2&gt;
+&lt;p&gt;I am currently studying Computer Engineering, so I don&#x27;t have a lot of time to work on a big project. But I do get some time off occasionally, which is enough for short projects. I want to utilize that time for to actually learn something. I am just getting surface level knowledge on topics while doing this, but it&#x27;s still something. &lt;&#x2F;p&gt;
+&lt;h2 id=&quot;tldr&quot;&gt;TLDR&lt;&#x2F;h2&gt;
+&lt;p&gt;I will write about a topic I don&#x27;t really know, mostly accompanied by the project I would have done related with it.&lt;&#x2F;p&gt;
+</content>
+	</entry>
 	<entry xml:lang="en">
 		<title>You can never forget your first</title>
 		<published>2023-01-07T00:00:00+00:00</published>

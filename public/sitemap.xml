@@ -7,11 +7,18 @@
         <loc>https://faultypointer.netlify.app/blog/</loc>
     </url>
     <url>
+        <loc>https://faultypointer.netlify.app/blog/a-bite-of-intro/</loc>
+        <lastmod>2023-01-08</lastmod>
+    </url>
+    <url>
         <loc>https://faultypointer.netlify.app/blog/you-can-never-forget-your-first/</loc>
         <lastmod>2023-01-07</lastmod>
     </url>
     <url>
         <loc>https://faultypointer.netlify.app/categories/</loc>
+    </url>
+    <url>
+        <loc>https://faultypointer.netlify.app/categories/a-bite-of/</loc>
     </url>
     <url>
         <loc>https://faultypointer.netlify.app/categories/rant/</loc>
@@ -23,7 +30,13 @@
         <loc>https://faultypointer.netlify.app/tags/</loc>
     </url>
     <url>
+        <loc>https://faultypointer.netlify.app/tags/a-bite-of/</loc>
+    </url>
+    <url>
         <loc>https://faultypointer.netlify.app/tags/first-programming-language/</loc>
+    </url>
+    <url>
+        <loc>https://faultypointer.netlify.app/tags/intro/</loc>
     </url>
     <url>
         <loc>https://faultypointer.netlify.app/tags/python/</loc>
