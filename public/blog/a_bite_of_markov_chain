@@ -1,0 +1,120 @@
++++
+title = "Markov Chain"
+date = 2023-01-08
+draft = false
+
+[taxonomies]
+categories = [""]
+tags = [""]
+
+[extra]
+lang = "en"
+toc = true
+show_comment = true
+math = false
+mermaid = false
+cc_license = true
+outdate_warn = true
+outdate_warn_days = 120
++++
+
+
+## What is Markov Chain?
+Markov Chain is a mathematical model that describes a sequence of possible events where the probability of each event is only dependent on the previous event.
+
+<!-- more -->
+
+## Example
+Suppose there are two states are A and B. At time 0, the system starts in state A. At each time step, there is a probability of 0.7 that the system will stay in state A, and a probability of 0.3 that it will transition to state B. If the system is in state B, there is a probability of 0.4 that it will stay in state B, and a probability of 0.6 that it will transition back to state A.
+
+Here the state transition diagram looks like this
+
+
+![Transition Diagram | 50](../../static/res/blogs/markov_eg.svg)
+
+So, you can see that the probabilities of transitioning from one state to another are fixed, and depend only on the current state.
+
+
+## Ai-minem: My attempt at Markov Chain
+
+It is the simplest form of markov chain. What I did was take a bunch of lyrics of eminem's song and use it to train a model then had the model spit out a rap. Lets go through the project:
+
+### Collecting Data
+
+I used requests to get the html data of the lyrics page and beautifulsoup4 to parse the data.
+
+```python
+lyric = ""
+res = requests.get(url)
+page = BeautifulSoup(res.content, "html.parser")
+for div in page.find_all(attrs={"class": "Lyrics__Container-sc-1ynbvzw-6"}):
+    for link in div.find_all("a"):
+        lyric += link.text.strip()
+        lyric += "\n"
+```
+
+
+### Markov Model
+Markov model is a class with members data and chain. Data is used to store the training data and chain is used to store the array of words that come after the current word.
+
+```python
+class Markov:
+    def __init__(self) -> None:
+    self.data = []
+    self.chain = {}
+
+    def add_data(self, data) -> None:
+        ...
+    def train(self):
+        ...
+    def spit_bars(self, n=100):
+        ...
+        
+```
+
+
+### Training the Markov Model
+The data I collected are array of strings where single string is the whole lyrics of a song. For training the model, I looped through each string(lyrics) and used regex to find all the words in that lyrics. Then for each word, I saved the words that come after it in the *chain* member. 
+
+```python
+def train(self):
+    for text in self.data:
+        words = re.findall(r'\w+', text)
+        for (i, word) in enumerate(words[:len(words)-1]):
+            if word in self.chain:
+                self.chain[word].append(words[i+1])
+            else:
+                self.chain[word] = []
+```
+
+
+### Spitting Bars
+Using the model to produce the lyrics is done through spit_bars function. It takes one optional argument, n, which denotes the number of words to produce. First, it selects a random word from the dictionary and saves it in the current variable. Then it loops n times, each time printing the current variable. Then it gets the list of possible choices using the current word as key from the chain dictionary. If the possible choices array is an empty, then all the keys from the dictionary become the possible choices. Then it sets the value of current to random word from possible choices and repeat.
+
+```python
+def spit_bars(self, n=100):
+    default_choices = list(self.chain.keys())
+    current = random.choice(default_choices)
+    i = 1
+    while i <= n:
+        if i % 15 == 0:
+            print("")
+        print(current, end=" ")
+        try:
+            choices = self.chain[current]
+        except KeyError:
+            choices = default_choices
+        
+        if choices:
+            current = random.choice(choices)
+        else:
+            current = random.choice(default_choices)            
+        i+=1
+    print("")
+```
+
+## What's next?
+I plan to make it so that instead of using just one word as a determining factor for the next word, it uses maybe 3 or 4 previous words to do so. I also want to use neural network or ML algorithm. Although I will probably forget about this since I started working on another project.
+
+
+That's it for today, see you in next blog.
