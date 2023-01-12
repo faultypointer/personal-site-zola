@@ -4,8 +4,8 @@ date = 2023-01-08
 draft = false
 
 [taxonomies]
-categories = [""]
-tags = [""]
+categories = ["A bite of"]
+tags = ["A bite of", "Markov Chain", "Artificial Intelligence", "AI", "python"]
 
 [extra]
 lang = "en"
