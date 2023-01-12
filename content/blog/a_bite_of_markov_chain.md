@@ -1,11 +1,11 @@
 +++
 title = "Markov Chain"
-date = 2023-01-08
+date = 2023-01-12
 draft = false
 
 [taxonomies]
 categories = ["A bite of"]
-tags = ["A bite of", "Markov Chain", "Artificial Intelligence", "AI", "python"]
+tags = ["A bite of", "python", "ai", "markov chain"]
 
 [extra]
 lang = "en"
@@ -19,18 +19,17 @@ outdate_warn_days = 120
 +++
 
 
-## What is Markov Chain?
-Markov Chain is a mathematical model that describes a sequence of possible events where the probability of each event is only dependent on the previous event.
+## What is a Markov Chain?
+A Markov Chain is a mathematical model that describes a sequence of possible events, where the probability of each event is only dependent on the previous event.
 
 <!-- more -->
 
 ## Example
 Suppose there are two states are A and B. At time 0, the system starts in state A. At each time step, there is a probability of 0.7 that the system will stay in state A, and a probability of 0.3 that it will transition to state B. If the system is in state B, there is a probability of 0.4 that it will stay in state B, and a probability of 0.6 that it will transition back to state A.
 
-Here the state transition diagram looks like this
+Here, the state transition diagram looks like this
 
-
-![Transition Diagram | 50](../../static/res/blogs/markov_eg.svg)
+<img src="/res/blogs/markov_eg.svg" height=350, width=350>
 
 So, you can see that the probabilities of transitioning from one state to another are fixed, and depend only on the current state.
 
@@ -112,6 +111,45 @@ def spit_bars(self, n=100):
         i+=1
     print("")
 ```
+
+
+### Output
+The markov model produced this output after training with 5 eminem's songs lyrics.
+
+	suffer Kneel autumn Spider throatin above missed This flippity type of money capI Made 
+	bigger help your concert heart readyTo cheese dope Bill truthful throat spray and shoot ya 
+	bombs fact this hole momentWould RakimLakim killed attack Fat are so bad it s a 
+	Doberman us to choke move like to a lifetime yoYou better never let it was 
+	a catchy heavyThere old in commonWe are hungry I got them uppers looks superstardom knees 
+	flippity reason is drop bombs explosions the trailer s all in the blueprint ma sleep 
+	and on the trunkBut 2004 Think gone cold I put em with your partners feet 
+	Did idolHe while he won t see at all And here s not miss your 
+	ass disastrously killers Make maxi pad Evil cut your mind to set your headSo talk 
+	rubber slip Pharoahe paraplegic the front to fuse audience totterCaught toward honestBut jealous While an 
+	MC realized fall positionTo May back pocket tongues These hoes is gaping f inadvertently arsenal 
+	chips forgot really got You don t know how much we re sayin face lookin 
+	boy cause I ve got some And even been up you scream which six years 
+	finna kill himself carry figure outHow to tell me to the fuck that anything you 
+	already know the Air Breezy lead Apache add jointsProlly burst at the fuck it s 
+	how much we have arms are over some bitch I could it life for sure 
+	you re cut your posters use sublim problem lose yourself like to feel like Apache 
+	Collins together think I m Back cold product of me know there to bite aStrap 
+	Up on Cause I m a product They moved Glock capableOf openMy stacked rarely Syllables 
+	read phat soldierTongue Get outta those days t utilize murderers or shot do thoughFor way 
+	to come at me do not miss your Gang Like you better lose yourself in 
+	a couple of RakimLakim jot reminds me like a pile 9See dawg room yackety ago 
+	helps voices vodka you better lose yourself like his tough demeanourSo songsSo buggin tGive caught 
+	lemons dah dah dah dah You re never asked change It s my family IGot 
+	out Chorus Dido My tea s how much it only grows hotter if I m 
+	beginnin to the flowsAnd B Up on her throat spray and Audemars jointsProlly Mom capture 
+	this is such swallow huh This little brother I can t breathe genital comin at 
+	me outside cornrows spot myself cause I ain t utilize Jordans ma name across coaster 
+	lead Syllables was a costly beginning along truthful finna kill you can t batter GoldmanI 
+	Slim I did that made itSo insult matter ColumbinePut fatal N9neIf wondering why IGot out 
+	like a time Shady you tell me notThis flippity sendin answer all hell yeah from 
+	your nose dove venom pull Bizarre after Mya said on my life And what I 
+	can barely knows his name was youDamn amplified skunk talk calm trunk white gotta dance 
+	long as fuck that s how 
 
 ## What's next?
 I plan to make it so that instead of using just one word as a determining factor for the next word, it uses maybe 3 or 4 previous words to do so. I also want to use neural network or ML algorithm. Although I will probably forget about this since I started working on another project.

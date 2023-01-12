@@ -11,6 +11,10 @@
         <lastmod>2023-01-08</lastmod>
     </url>
     <url>
+        <loc>https://faultypointer.netlify.app/blog/a-bite-of-markov-chain/</loc>
+        <lastmod>2023-01-12</lastmod>
+    </url>
+    <url>
         <loc>https://faultypointer.netlify.app/blog/you-can-never-forget-your-first/</loc>
         <lastmod>2023-01-07</lastmod>
     </url>
@@ -33,10 +37,16 @@
         <loc>https://faultypointer.netlify.app/tags/a-bite-of/</loc>
     </url>
     <url>
+        <loc>https://faultypointer.netlify.app/tags/ai/</loc>
+    </url>
+    <url>
         <loc>https://faultypointer.netlify.app/tags/first-programming-language/</loc>
     </url>
     <url>
         <loc>https://faultypointer.netlify.app/tags/intro/</loc>
+    </url>
+    <url>
+        <loc>https://faultypointer.netlify.app/tags/markov-chain/</loc>
     </url>
     <url>
         <loc>https://faultypointer.netlify.app/tags/python/</loc>

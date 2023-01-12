@@ -4,21 +4,139 @@
 	<subtitle>My blog page</subtitle>
 	<link href="https://faultypointer.netlify.app/blog/feed.xml" rel="self" type="application/atom+xml"/>
     <link href="https://faultypointer.netlify.app/blog/"/>
-	<updated>2023-01-08T00:00:00+00:00</updated>
+	<updated>2023-01-12T00:00:00+00:00</updated>
 	<id>https://faultypointer.netlify.app/blog/feed.xml</id>
+	<entry xml:lang="en">
+		<title>Markov Chain</title>
+		<published>2023-01-12T00:00:00+00:00</published>
+		<updated>2023-01-12T00:00:00+00:00</updated>
+        <summary>&lt;h2 id=&quot;what-is-a-markov-chain&quot;&gt;What is a Markov Chain?&lt;&#x2F;h2&gt;
+&lt;p&gt;A Markov Chain is a mathematical model that describes a sequence of possible events, where the probability of each event is only dependent on the previous event.&lt;&#x2F;p&gt;
+</summary>
+		<link href="https://faultypointer.netlify.app/blog/a-bite-of-markov-chain/" type="text/html"/>
+		<id>https://faultypointer.netlify.app/blog/a-bite-of-markov-chain/</id>
+		<content type="html">&lt;h2 id=&quot;what-is-a-markov-chain&quot;&gt;What is a Markov Chain?&lt;&#x2F;h2&gt;
+&lt;p&gt;A Markov Chain is a mathematical model that describes a sequence of possible events, where the probability of each event is only dependent on the previous event.&lt;&#x2F;p&gt;
+&lt;span id=&quot;continue-reading&quot;&gt;&lt;&#x2F;span&gt;&lt;h2 id=&quot;example&quot;&gt;Example&lt;&#x2F;h2&gt;
+&lt;p&gt;Suppose there are two states are A and B. At time 0, the system starts in state A. At each time step, there is a probability of 0.7 that the system will stay in state A, and a probability of 0.3 that it will transition to state B. If the system is in state B, there is a probability of 0.4 that it will stay in state B, and a probability of 0.6 that it will transition back to state A.&lt;&#x2F;p&gt;
+&lt;p&gt;Here, the state transition diagram looks like this&lt;&#x2F;p&gt;
+&lt;img src=&quot;&#x2F;res&#x2F;blogs&#x2F;markov_eg.svg&quot; height=350, width=350&gt;
+&lt;p&gt;So, you can see that the probabilities of transitioning from one state to another are fixed, and depend only on the current state.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;ai-minem-my-attempt-at-markov-chain&quot;&gt;Ai-minem: My attempt at Markov Chain&lt;&#x2F;h2&gt;
+&lt;p&gt;It is the simplest form of markov chain. What I did was take a bunch of lyrics of eminem&#x27;s song and use it to train a model then had the model spit out a rap. Lets go through the project:&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;collecting-data&quot;&gt;Collecting Data&lt;&#x2F;h3&gt;
+&lt;p&gt;I used requests to get the html data of the lyrics page and beautifulsoup4 to parse the data.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;python&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-python &quot;&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span&gt;lyric &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;res &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;requests&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;get&lt;&#x2F;span&gt;&lt;span&gt;(url)
+&lt;&#x2F;span&gt;&lt;span&gt;page &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;BeautifulSoup&lt;&#x2F;span&gt;&lt;span&gt;(res&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span&gt;content&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;html.parser&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;for &lt;&#x2F;span&gt;&lt;span&gt;div &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;in &lt;&#x2F;span&gt;&lt;span&gt;page&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;find_all&lt;&#x2F;span&gt;&lt;span&gt;(attrs&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span&gt;{&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;class&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;Lyrics__Container-sc-1ynbvzw-6&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;}):
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;for &lt;&#x2F;span&gt;&lt;span&gt;link &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;in &lt;&#x2F;span&gt;&lt;span&gt;div&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;find_all&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;a&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;):
+&lt;&#x2F;span&gt;&lt;span&gt;        lyric &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;+= &lt;&#x2F;span&gt;&lt;span&gt;link&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span&gt;text&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;strip&lt;&#x2F;span&gt;&lt;span&gt;()
+&lt;&#x2F;span&gt;&lt;span&gt;        lyric &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;+= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ebcb8b;&quot;&gt;\n&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h3 id=&quot;markov-model&quot;&gt;Markov Model&lt;&#x2F;h3&gt;
+&lt;p&gt;Markov model is a class with members data and chain. Data is used to store the training data and chain is used to store the array of words that come after the current word.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;python&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-python &quot;&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;class &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;Markov&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;def &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;__init__&lt;&#x2F;span&gt;&lt;span&gt;(self) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;-&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;None&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;self.&lt;&#x2F;span&gt;&lt;span&gt;data &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;[]
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;self.&lt;&#x2F;span&gt;&lt;span&gt;chain &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;{}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;def &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;add_data&lt;&#x2F;span&gt;&lt;span&gt;(self&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span&gt;data) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;-&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;None&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;...
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;def &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;train&lt;&#x2F;span&gt;&lt;span&gt;(self):
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;...
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;def &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;spit_bars&lt;&#x2F;span&gt;&lt;span&gt;(self&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span&gt;n&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;100&lt;&#x2F;span&gt;&lt;span&gt;):
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;...
+&lt;&#x2F;span&gt;&lt;span&gt;        
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h3 id=&quot;training-the-markov-model&quot;&gt;Training the Markov Model&lt;&#x2F;h3&gt;
+&lt;p&gt;The data I collected are array of strings where single string is the whole lyrics of a song. For training the model, I looped through each string(lyrics) and used regex to find all the words in that lyrics. Then for each word, I saved the words that come after it in the &lt;em&gt;chain&lt;&#x2F;em&gt; member. &lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;python&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-python &quot;&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;def &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;train&lt;&#x2F;span&gt;&lt;span&gt;(self):
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;for &lt;&#x2F;span&gt;&lt;span&gt;text &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;in self.&lt;&#x2F;span&gt;&lt;span&gt;data:
+&lt;&#x2F;span&gt;&lt;span&gt;        words &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;re&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;findall&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;r&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;#39;\w&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;#39;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span&gt;text)
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;for &lt;&#x2F;span&gt;&lt;span&gt;(i&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span&gt;word) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;in &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#88c0d0;&quot;&gt;enumerate&lt;&#x2F;span&gt;&lt;span&gt;(words[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#88c0d0;&quot;&gt;len&lt;&#x2F;span&gt;&lt;span&gt;(words)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;-&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;]):
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;word &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;in self.&lt;&#x2F;span&gt;&lt;span&gt;chain:
+&lt;&#x2F;span&gt;&lt;span&gt;                &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;self.&lt;&#x2F;span&gt;&lt;span&gt;chain[word]&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;append&lt;&#x2F;span&gt;&lt;span&gt;(words[i&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;])
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;else&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;                &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;self.&lt;&#x2F;span&gt;&lt;span&gt;chain[word] &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;[]
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h3 id=&quot;spitting-bars&quot;&gt;Spitting Bars&lt;&#x2F;h3&gt;
+&lt;p&gt;Using the model to produce the lyrics is done through spit_bars function. It takes one optional argument, n, which denotes the number of words to produce. First, it selects a random word from the dictionary and saves it in the current variable. Then it loops n times, each time printing the current variable. Then it gets the list of possible choices using the current word as key from the chain dictionary. If the possible choices array is an empty, then all the keys from the dictionary become the possible choices. Then it sets the value of current to random word from possible choices and repeat.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;python&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-python &quot;&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;def &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;spit_bars&lt;&#x2F;span&gt;&lt;span&gt;(self&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span&gt;n&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;100&lt;&#x2F;span&gt;&lt;span&gt;):
+&lt;&#x2F;span&gt;&lt;span&gt;    default_choices &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= list&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;self.&lt;&#x2F;span&gt;&lt;span&gt;chain&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;keys&lt;&#x2F;span&gt;&lt;span&gt;())
+&lt;&#x2F;span&gt;&lt;span&gt;    current &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;random&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;choice&lt;&#x2F;span&gt;&lt;span&gt;(default_choices)
+&lt;&#x2F;span&gt;&lt;span&gt;    i &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;1
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;while &lt;&#x2F;span&gt;&lt;span&gt;i &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;lt;= &lt;&#x2F;span&gt;&lt;span&gt;n:
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;i &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;% &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;15 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;== &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#88c0d0;&quot;&gt;print&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#88c0d0;&quot;&gt;print&lt;&#x2F;span&gt;&lt;span&gt;(current&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span&gt;end&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot; &amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;try&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;            choices &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= self.&lt;&#x2F;span&gt;&lt;span&gt;chain[current]
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;except &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;KeyError&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;            choices &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;default_choices
+&lt;&#x2F;span&gt;&lt;span&gt;        
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;choices:
+&lt;&#x2F;span&gt;&lt;span&gt;            current &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;random&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;choice&lt;&#x2F;span&gt;&lt;span&gt;(choices)
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;else&lt;&#x2F;span&gt;&lt;span&gt;:
+&lt;&#x2F;span&gt;&lt;span&gt;            current &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;random&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;choice&lt;&#x2F;span&gt;&lt;span&gt;(default_choices)            
+&lt;&#x2F;span&gt;&lt;span&gt;        i&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;+=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;1
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#88c0d0;&quot;&gt;print&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h3 id=&quot;output&quot;&gt;Output&lt;&#x2F;h3&gt;
+&lt;p&gt;The markov model produced this output after training with 5 eminem&#x27;s songs lyrics.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;color:#d8dee9;&quot;&gt;&lt;code&gt;&lt;span&gt;suffer Kneel autumn Spider throatin above missed This flippity type of money capI Made 
+&lt;&#x2F;span&gt;&lt;span&gt;bigger help your concert heart readyTo cheese dope Bill truthful throat spray and shoot ya 
+&lt;&#x2F;span&gt;&lt;span&gt;bombs fact this hole momentWould RakimLakim killed attack Fat are so bad it s a 
+&lt;&#x2F;span&gt;&lt;span&gt;Doberman us to choke move like to a lifetime yoYou better never let it was 
+&lt;&#x2F;span&gt;&lt;span&gt;a catchy heavyThere old in commonWe are hungry I got them uppers looks superstardom knees 
+&lt;&#x2F;span&gt;&lt;span&gt;flippity reason is drop bombs explosions the trailer s all in the blueprint ma sleep 
+&lt;&#x2F;span&gt;&lt;span&gt;and on the trunkBut 2004 Think gone cold I put em with your partners feet 
+&lt;&#x2F;span&gt;&lt;span&gt;Did idolHe while he won t see at all And here s not miss your 
+&lt;&#x2F;span&gt;&lt;span&gt;ass disastrously killers Make maxi pad Evil cut your mind to set your headSo talk 
+&lt;&#x2F;span&gt;&lt;span&gt;rubber slip Pharoahe paraplegic the front to fuse audience totterCaught toward honestBut jealous While an 
+&lt;&#x2F;span&gt;&lt;span&gt;MC realized fall positionTo May back pocket tongues These hoes is gaping f inadvertently arsenal 
+&lt;&#x2F;span&gt;&lt;span&gt;chips forgot really got You don t know how much we re sayin face lookin 
+&lt;&#x2F;span&gt;&lt;span&gt;boy cause I ve got some And even been up you scream which six years 
+&lt;&#x2F;span&gt;&lt;span&gt;finna kill himself carry figure outHow to tell me to the fuck that anything you 
+&lt;&#x2F;span&gt;&lt;span&gt;already know the Air Breezy lead Apache add jointsProlly burst at the fuck it s 
+&lt;&#x2F;span&gt;&lt;span&gt;how much we have arms are over some bitch I could it life for sure 
+&lt;&#x2F;span&gt;&lt;span&gt;you re cut your posters use sublim problem lose yourself like to feel like Apache 
+&lt;&#x2F;span&gt;&lt;span&gt;Collins together think I m Back cold product of me know there to bite aStrap 
+&lt;&#x2F;span&gt;&lt;span&gt;Up on Cause I m a product They moved Glock capableOf openMy stacked rarely Syllables 
+&lt;&#x2F;span&gt;&lt;span&gt;read phat soldierTongue Get outta those days t utilize murderers or shot do thoughFor way 
+&lt;&#x2F;span&gt;&lt;span&gt;to come at me do not miss your Gang Like you better lose yourself in 
+&lt;&#x2F;span&gt;&lt;span&gt;a couple of RakimLakim jot reminds me like a pile 9See dawg room yackety ago 
+&lt;&#x2F;span&gt;&lt;span&gt;helps voices vodka you better lose yourself like his tough demeanourSo songsSo buggin tGive caught 
+&lt;&#x2F;span&gt;&lt;span&gt;lemons dah dah dah dah You re never asked change It s my family IGot 
+&lt;&#x2F;span&gt;&lt;span&gt;out Chorus Dido My tea s how much it only grows hotter if I m 
+&lt;&#x2F;span&gt;&lt;span&gt;beginnin to the flowsAnd B Up on her throat spray and Audemars jointsProlly Mom capture 
+&lt;&#x2F;span&gt;&lt;span&gt;this is such swallow huh This little brother I can t breathe genital comin at 
+&lt;&#x2F;span&gt;&lt;span&gt;me outside cornrows spot myself cause I ain t utilize Jordans ma name across coaster 
+&lt;&#x2F;span&gt;&lt;span&gt;lead Syllables was a costly beginning along truthful finna kill you can t batter GoldmanI 
+&lt;&#x2F;span&gt;&lt;span&gt;Slim I did that made itSo insult matter ColumbinePut fatal N9neIf wondering why IGot out 
+&lt;&#x2F;span&gt;&lt;span&gt;like a time Shady you tell me notThis flippity sendin answer all hell yeah from 
+&lt;&#x2F;span&gt;&lt;span&gt;your nose dove venom pull Bizarre after Mya said on my life And what I 
+&lt;&#x2F;span&gt;&lt;span&gt;can barely knows his name was youDamn amplified skunk talk calm trunk white gotta dance 
+&lt;&#x2F;span&gt;&lt;span&gt;long as fuck that s how 
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h2 id=&quot;what-s-next&quot;&gt;What&#x27;s next?&lt;&#x2F;h2&gt;
+&lt;p&gt;I plan to make it so that instead of using just one word as a determining factor for the next word, it uses maybe 3 or 4 previous words to do so. I also want to use neural network or ML algorithm. Although I will probably forget about this since I started working on another project.&lt;&#x2F;p&gt;
+&lt;p&gt;That&#x27;s it for today, see you in next blog.&lt;&#x2F;p&gt;
+</content>
+	</entry>
 	<entry xml:lang="en">
 		<title>Introduction</title>
 		<published>2023-01-08T00:00:00+00:00</published>
 		<updated>2023-01-08T00:00:00+00:00</updated>
         <summary>&lt;h2 id=&quot;what-is-a-bite-of&quot;&gt;What is A Bite Of?&lt;&#x2F;h2&gt;
 &lt;p&gt;It&#x27;s a series of blogs where I try to explain very little about a topic I have no deep or maybe not even an intermediate understanding of.
-For example, I may try to explain about &lt;a href=&quot;.&#x2F;a_bite_of_markov_chain.md&quot;&gt;Markov Chain&lt;&#x2F;a&gt; which I clearly don&#x27;t have adequate knowledge of.&lt;&#x2F;p&gt;
+For example, I may try to explain about &lt;a href=&quot;https:&#x2F;&#x2F;faultypointer.netlify.app&#x2F;blog&#x2F;a-bite-of-markov-chain&#x2F;&quot;&gt;Markov Chain&lt;&#x2F;a&gt;) which I clearly don&#x27;t have adequate knowledge of.&lt;&#x2F;p&gt;
 </summary>
 		<link href="https://faultypointer.netlify.app/blog/a-bite-of-intro/" type="text/html"/>
 		<id>https://faultypointer.netlify.app/blog/a-bite-of-intro/</id>
 		<content type="html">&lt;h2 id=&quot;what-is-a-bite-of&quot;&gt;What is A Bite Of?&lt;&#x2F;h2&gt;
 &lt;p&gt;It&#x27;s a series of blogs where I try to explain very little about a topic I have no deep or maybe not even an intermediate understanding of.
-For example, I may try to explain about &lt;a href=&quot;.&#x2F;a_bite_of_markov_chain.md&quot;&gt;Markov Chain&lt;&#x2F;a&gt; which I clearly don&#x27;t have adequate knowledge of.&lt;&#x2F;p&gt;
+For example, I may try to explain about &lt;a href=&quot;https:&#x2F;&#x2F;faultypointer.netlify.app&#x2F;blog&#x2F;a-bite-of-markov-chain&#x2F;&quot;&gt;Markov Chain&lt;&#x2F;a&gt;) which I clearly don&#x27;t have adequate knowledge of.&lt;&#x2F;p&gt;
 &lt;span id=&quot;continue-reading&quot;&gt;&lt;&#x2F;span&gt;&lt;h2 id=&quot;why-am-i-doing-this&quot;&gt;Why am I doing this?&lt;&#x2F;h2&gt;
 &lt;p&gt;I am currently studying Computer Engineering, so I don&#x27;t have a lot of time to work on a big project. But I do get some time off occasionally, which is enough for short projects. I want to utilize that time for to actually learn something. I am just getting surface level knowledge on topics while doing this, but it&#x27;s still something. &lt;&#x2F;p&gt;
 &lt;h2 id=&quot;tldr&quot;&gt;TLDR&lt;&#x2F;h2&gt;

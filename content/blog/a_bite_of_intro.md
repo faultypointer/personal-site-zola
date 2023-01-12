@@ -20,7 +20,7 @@ outdate_warn_days = 120
 
 ## What is A Bite Of?
 It's a series of blogs where I try to explain very little about a topic I have no deep or maybe not even an intermediate understanding of.
-For example, I may try to explain about [Markov Chain](a_bite_of_markov_chain.md) which I clearly don't have adequate knowledge of.
+For example, I may try to explain about [Markov Chain](@/blog/a_bite_of_markov_chain.md)) which I clearly don't have adequate knowledge of.
 <!-- more -->
 
 ## Why am I doing this?
