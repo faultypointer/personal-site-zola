@@ -15,6 +15,10 @@
         <lastmod>2023-01-12</lastmod>
     </url>
     <url>
+        <loc>https://faultypointer.netlify.app/blog/story-time-skyler/</loc>
+        <lastmod>2023-01-15</lastmod>
+    </url>
+    <url>
         <loc>https://faultypointer.netlify.app/blog/you-can-never-forget-your-first/</loc>
         <lastmod>2023-01-07</lastmod>
     </url>
@@ -26,6 +30,9 @@
     </url>
     <url>
         <loc>https://faultypointer.netlify.app/categories/rant/</loc>
+    </url>
+    <url>
+        <loc>https://faultypointer.netlify.app/categories/story-time/</loc>
     </url>
     <url>
         <loc>https://faultypointer.netlify.app/projects/</loc>
@@ -40,7 +47,13 @@
         <loc>https://faultypointer.netlify.app/tags/ai/</loc>
     </url>
     <url>
+        <loc>https://faultypointer.netlify.app/tags/dark/</loc>
+    </url>
+    <url>
         <loc>https://faultypointer.netlify.app/tags/first-programming-language/</loc>
+    </url>
+    <url>
+        <loc>https://faultypointer.netlify.app/tags/future/</loc>
     </url>
     <url>
         <loc>https://faultypointer.netlify.app/tags/intro/</loc>
@@ -50,5 +63,8 @@
     </url>
     <url>
         <loc>https://faultypointer.netlify.app/tags/python/</loc>
+    </url>
+    <url>
+        <loc>https://faultypointer.netlify.app/tags/storytime/</loc>
     </url>
 </urlset>
