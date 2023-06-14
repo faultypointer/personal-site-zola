@@ -4,8 +4,28 @@
 	<subtitle>My blog page</subtitle>
 	<link href="https://faultypointer.netlify.app/blog/feed.xml" rel="self" type="application/atom+xml"/>
     <link href="https://faultypointer.netlify.app/blog/"/>
-	<updated>2023-01-15T00:00:00+00:00</updated>
+	<updated>2023-06-14T00:00:00+00:00</updated>
 	<id>https://faultypointer.netlify.app/blog/feed.xml</id>
+	<entry xml:lang="en">
+		<title>First Step</title>
+		<published>2023-06-14T00:00:00+00:00</published>
+		<updated>2023-06-14T00:00:00+00:00</updated>
+		<link href="https://faultypointer.netlify.app/blog/jttcoos-first-step/" type="text/html"/>
+		<id>https://faultypointer.netlify.app/blog/jttcoos-first-step/</id>
+		<content type="html">&lt;h2 id=&quot;background&quot;&gt;Background&lt;&#x2F;h2&gt;
+&lt;p&gt;I have been interested in systems programming and operating system for not that long. But in that duration, I have come to find it a very interesting and challenging topic to learn and possibly work (in the future). That is why I have decided to learn about how to develop operating system. And also the fact that &lt;a rel=&quot;nofollow noreferrer&quot; href=&quot;https:&#x2F;&#x2F;scientiac.space&#x2F;&quot;&gt;scientiac&lt;&#x2F;a&gt; suggested that we build a operating system for our final year project.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;why-not-just-learn-it-why-the-need-to-make-a-blog-about-it&quot;&gt;Why not just learn it? Why the need to make a blog about it?&lt;&#x2F;h3&gt;
+&lt;p&gt;... uh ..  Aha. It&#x27;s because it helps me to organize and articulate my thoughts about what I&#x27;ve learned. It could also serve as a note for me to look back on. Maybe someone, who is also interested in learning about operating system, can find this helpful. So there you go, that is why I am writing this blog and totally not because I like to write blogs but can&#x27;t come up with a creative thing to write about.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;note&quot;&gt;NOTE&lt;&#x2F;h2&gt;
+&lt;p&gt;&lt;strong&gt;I am writing these blogs as I am learning it so I may write something that may not be technical or might just be outright wrong. So you know what not to do.&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;the-two-sides-of-operating-system&quot;&gt;The two sides of operating system&lt;&#x2F;h2&gt;
+&lt;p&gt;There are two ways to explain the working of an operating system.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;as-an-extended-machine&quot;&gt;As an extended machine&lt;&#x2F;h3&gt;
+&lt;p&gt;The architecture of most computers is messy, primitive and awkward. Its very difficult to program. That&#x27;s where operating system comes in and makes the lives of those who want to program easy by providing good and easy to use abstaction for everything. Operating system turns ugly hardware stuff into beautiful interface.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;as-a-resource-manager&quot;&gt;As a resource manager&lt;&#x2F;h3&gt;
+&lt;p&gt;Modern computers have a lot of memory and cpu power, but they are not unlimited. Operating system manages the controlled and orderly allocation of the computer resources like processors, memory, I&#x2F;O devices etc. &lt;&#x2F;p&gt;
+</content>
+	</entry>
 	<entry xml:lang="en">
 		<title>Skyler</title>
 		<published>2023-01-15T00:00:00+00:00</published>
