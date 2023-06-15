@@ -1,0 +1,198 @@
+<!doctype html><html lang=en><head><meta charset=UTF-8><meta content="width=device-width,initial-scale=1.0" name=viewport><meta content="light dark" name=color-scheme><title>Building A Hello World Kernel</title><meta name=description><link href=/img/favicon-32x32.png rel=icon sizes=32x32 type=image/png><link href=/img/favicon-16x16.png rel=icon sizes=16x16 type=image/png><link href=/img/apple-touch-icon.png rel=apple-touch-icon sizes=180x180><link href=https://fonts.googleapis.com rel=preconnect><link crossorigin href=https://fonts.gstatic.com rel=preconnect><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Jost&display=swap" rel=stylesheet><link href=https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css rel=stylesheet><link href=/css/var.css rel=stylesheet><link href=/css/base.css rel=stylesheet><link href=/css/header.css rel=stylesheet><link href=/css/footer.css rel=stylesheet><link href=/css/post.css rel=stylesheet><body><script>if(localStorage.getItem('theme')=='dark'){document.body.classList.add('dark-mode')}</script><header class=blur><div class=top><a class="header blog" href=/blog><i class="ri-quill-pen-line ri-2x"></i><span>Blog</span></a><a class=back href=/><i class="ri-arrow-left-s-line ri-1x"></i><span>Home</span></a><div class=icon><a aria-label=home href=/ id=go-home><i class="ri-user-6-line ri-xl"></i></a><a aria-label="rss feed" href=/blog/feed.xml><i class="ri-rss-line ri-xl"></i></a><button aria-label="dark light mode switch" id=color-toggle><i class="ri-moon-line ri-xl"></i></button><button aria-label="table of content" id=toc-toggle><i class="ri-menu-2-line ri-xl"></i></button></div></div><div id=progress-bar></div></header><div class=wrap><div class=blank></div><main><div id=top></div><article><h1>Building A Hello World Kernel</h1><div id=post-info><div class=date><span id=publish>2023-06-15</span></div><div class=tags><a class=tag href=https://faultypointer.netlify.app/tags/operating-system><i class="ri-hashtag ri-sm"></i><span>operating system</span></a><a class=tag href=https://faultypointer.netlify.app/tags/systems-programming><i class="ri-hashtag ri-sm"></i><span>systems programming</span></a><a class=tag href=https://faultypointer.netlify.app/tags/assembly><i class="ri-hashtag ri-sm"></i><span>assembly</span></a></div></div><blockquote class="note hidden" data-text1="Note: This article was last updated " data-text2=" days ago and may be out of date." data-days=120 id=outdate_warn><i class="ri-alarm-warning-line ri-lg"></i><span></span></blockquote><h2 id=intro>Intro</h2><p>Reading about the workings and development of operating system is fascinating but there is still something missing. Getting your hands dirty with the code and racking your brain over something for hours only to give up and copying some code is way more interesting. Needless to say you shouldn't give up reading the theory — maybe you can? who am I to say. I am just getting started myself.<p>Reading theory and writing code in parallel is the way I like to do things .That is what I am gonna do. And obviously the best way to start is to write a hello world kernel. By write I mean copy it from <a rel="nofollow noreferrer" href=https://wiki.osdev.org/Main_Page>OSDevWiki</a>.<h2 id=before-we-get-started>Before we get started</h2><p>there are few things that we should know about so that atleast we understand what is going on rather than mindlessly following the guide.<h3 id=cross-compiler>Cross compiler</h3><p>Its a compiler that runs on a system(called Host) but generated the executable for another system(called Target. I am gonna show how I installed the GNU cross compiler for i686 system on linux so if you are on windows or mac get rekt. But also you can go to <a rel="nofollow noreferrer" href=https://wiki.osdev.org/Building_GCC>osdevwiki</a> to see how to build it on other system.<ol><li>Installing the dependencies</ol><pre class=language-bash data-lang=bash style=background:#2e3440;color:#d8dee9><code class=language-bash data-lang=bash><span>	</span><span style=color:#88c0d0>sudo</span><span> dnf install gcc g++ make bison flex gmp-devel libmpc-devel mpfr-devel texinfo cloog-devel isl-devel
+</span></code></pre><ol start=2><li>Download and extract the source code download the source code from <a rel="nofollow noreferrer" href=https://ftp.gnu.org/gnu/binutils/>binutils</a> and <a rel="nofollow noreferrer" href=https://ftp.gnu.org/gnu/gcc/>gcc</a> and put them where you like for eg ~/src.</ol><pre class=language-bash data-lang=bash style=background:#2e3440;color:#d8dee9><code class=language-bash data-lang=bash><span>	</span><span style=color:#88c0d0>cd </span><span style=color:#81a1c1>~</span><span>/src
+</span><span>	</span><span style=color:#88c0d0>tar</span><span> xf gcc.x.stuff binutils.x.stuff
+</span></code></pre><ol start=3><li>Preparation decide where to install the binaries and for which system. ~/opt/ should be a good place to install. since i am compiling for i686, target system will be i686-elf</ol><pre class=language-bash data-lang=bash style=background:#2e3440;color:#d8dee9><code class=language-bash data-lang=bash><span>	</span><span style=color:#81a1c1>export </span><span>PREFIX</span><span style=color:#81a1c1>=</span><span style=color:#a3be8c>"</span><span style=color:#81a1c1>$</span><span>HOME</span><span style=color:#a3be8c>/opt/"
+</span><span>	</span><span style=color:#81a1c1>export </span><span>TARGET</span><span style=color:#81a1c1>=</span><span style=color:#a3be8c>i686-elf
+</span></code></pre><ol start=4><li>Installing Binutils</ol><pre class=language-bash data-lang=bash style=background:#2e3440;color:#d8dee9><code class=language-bash data-lang=bash><span style=color:#88c0d0>cd </span><span style=color:#81a1c1>~</span><span>/src/binutils.x.stuff
+</span><span style=color:#88c0d0>mkdir</span><span> build </span><span style=color:#81a1c1>&& </span><span style=color:#88c0d0>cd</span><span> build
+</span><span style=color:#88c0d0>../configure</span><span> --prefix</span><span style=color:#81a1c1>=</span><span style=color:#a3be8c>"</span><span style=color:#81a1c1>$</span><span>PREFIX</span><span style=color:#a3be8c>"</span><span> --target</span><span style=color:#81a1c1>=</span><span style=color:#a3be8c>"</span><span style=color:#81a1c1>$</span><span>TARGET</span><span style=color:#a3be8c>"</span><span> --disable-nls --disable-werror
+</span><span style=color:#88c0d0>make
+</span><span style=color:#88c0d0>make</span><span> install
+</span></code></pre><ol start=5><li>Installing GCC</ol><pre class=language-bash data-lang=bash style=background:#2e3440;color:#d8dee9><code class=language-bash data-lang=bash><span style=color:#88c0d0>cd </span><span style=color:#81a1c1>~</span><span>/src/gcc.x.stuff
+</span><span style=color:#88c0d0>mkdir</span><span> build </span><span style=color:#81a1c1>&& </span><span style=color:#88c0d0>cd</span><span> build
+</span><span style=color:#88c0d0>../configure</span><span> --prefix</span><span style=color:#81a1c1>=</span><span style=color:#a3be8c>"</span><span style=color:#81a1c1>$</span><span>PREFIX</span><span style=color:#a3be8c>"</span><span> --target</span><span style=color:#81a1c1>=</span><span style=color:#a3be8c>"</span><span style=color:#81a1c1>$</span><span>TARGET</span><span style=color:#a3be8c>"</span><span> --disable-nls --enable-language</span><span style=color:#81a1c1>=</span><span>c,c++
+</span><span style=color:#88c0d0>make</span><span> all-gcc
+</span><span style=color:#88c0d0>make</span><span> all-target-libgcc 
+</span><span style=color:#88c0d0>make</span><span> install-gcc
+</span><span style=color:#88c0d0>make</span><span> install-target-libgcc
+</span></code></pre><ol start=5><li>adding to path add this to the .bashrc</ol><pre class=language-bash data-lang=bash style=background:#2e3440;color:#d8dee9><code class=language-bash data-lang=bash><span>	</span><span style=color:#81a1c1>export </span><span>PATH</span><span style=color:#81a1c1>=</span><span style=color:#a3be8c>"</span><span style=color:#81a1c1>$</span><span>HOME</span><span style=color:#a3be8c>/opt/bin/:</span><span style=color:#81a1c1>$</span><span>PATH</span><span style=color:#a3be8c>"
+</span></code></pre><h3 id=booting-the-system>Booting the system</h3><ul><li>Existing piece of software is required to load our operating system which is called the bootloader. Popular bootloaders are GRUB, limine.<li>Bootloader follows a certain protocol that outlines the communication and data exchange between the bootloader, firmware and the kernel.<li>Multiboot is one such protocol. It enables the bootloader to pass important information line memory map, command line arguments and other details to the kernel.</ul><h3 id=freestanding-and-hosted>Freestanding and Hosted</h3><p>A hosted binary is an executable that is compiled to run on a specific system. It relies on standrad library provided by the host system.<p>A freestanding binary is one that is compiled without a specific system in mind. As such it can't use the standrad library features.<h2 id=writing-the-kernel>Writing the Kernel</h2><p>Since we are writing a kernel that prints hello world on screen without using standrad library features, we will have to make use of vga text mode. Video Graphics Array(vga) text mode is a display mode that is supported by most modern computer.<h3 id=understanding-vga-text-mode>Understanding VGA text mode</h3><p>In VGA text mode, the screen is divided into a rectangular grid of fixed-size character cells. Each cell can display a single character from the ASCII character set and is associated with a specific foreground and background color.<p>Each screen character is represented by 16 bits accessible by the cpu. The 8 least significant bits are character bits that represent ascii character, 9th to 12th bits are for foreground color and rest of the bits are for background color. Depending on the mode setup, the most significant bit might be blink bit.<table><thead><tr><th>Background<th>Foreground<th>Character<tbody><tr><td>0 0 0 0<td>0 0 0 0<td>0 0 0 0 0 0 0 0</table><h4 id=vga-color-palette>VGA Color palette</h4><table><thead><tr><th>Color<th>integer<th>binary<tbody><tr><td>black<td>0<td>0000<tr><td>blue<td>1<td>0001<tr><td>green<td>2<td>0010<tr><td>cyan<td>3<td>0011<tr><td>red<td>4<td>0100<tr><td>magenta<td>5<td>0101<tr><td>brown<td>6<td>0110<tr><td>light grey<td>7<td>0111<tr><td>dark grey<td>8<td>1000<tr><td>light blue<td>9<td>1001<tr><td>light green<td>10<td>1010<tr><td>light cyan<td>11<td>1011<tr><td>light red<td>12<td>1100<tr><td>light magenta<td>13<td>1101<tr><td>light brown<td>14<td>1110<tr><td>white<td>15<td>1111</table><p>so if you want to print white coloured 'H' on black background you would have to write this 16 bit sequence at the appropriate buffer index. 0 0 0 0 | 1 1 1 1 | 0 1 0 0 1 0 0 0 Black bg | white fg | 'H' ascii 72<p>with this knowledge lets write a kernel that prints hello world on screen.<pre class=language-cpp data-lang=cpp style=background:#2e3440;color:#d8dee9><code class=language-cpp data-lang=cpp><span style=color:#5e81ac>#include </span><span style=color:#a3be8c>&LTstdint.h> </span><span style=color:#616e88>// stuff like size_t, uint8_t etc
+</span><span style=color:#5e81ac>#include </span><span style=color:#a3be8c>&LTstddef.h>
+</span><span>
+</span><span style=color:#616e88>// vga color palettes
+</span><span style=color:#81a1c1>enum class </span><span style=color:#8fbcbb>vga_color </span><span style=color:#eceff4>: </span><span style=color:#8fbcbb>uint8_t </span><span>{
+</span><span>	VGA_COLOR_BLACK </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>0</span><span style=color:#eceff4>,
+</span><span>	VGA_COLOR_BLUE </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>1</span><span style=color:#eceff4>,
+</span><span>	VGA_COLOR_GREEN </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>2</span><span style=color:#eceff4>,
+</span><span>	VGA_COLOR_CYAN </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>3</span><span style=color:#eceff4>,
+</span><span>	VGA_COLOR_RED </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>4</span><span style=color:#eceff4>,
+</span><span>	VGA_COLOR_MAGENTA </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>5</span><span style=color:#eceff4>,
+</span><span>	VGA_COLOR_BROWN </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>6</span><span style=color:#eceff4>,
+</span><span>	VGA_COLOR_LIGHT_GREY </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>7</span><span style=color:#eceff4>,
+</span><span>	VGA_COLOR_DARK_GREY </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>8</span><span style=color:#eceff4>,
+</span><span>	VGA_COLOR_LIGHT_BLUE </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>9</span><span style=color:#eceff4>,
+</span><span>	VGA_COLOR_LIGHT_GREEN </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>10</span><span style=color:#eceff4>,
+</span><span>	VGA_COLOR_LIGHT_CYAN </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>11</span><span style=color:#eceff4>,
+</span><span>	VGA_COLOR_LIGHT_RED </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>12</span><span style=color:#eceff4>,
+</span><span>	VGA_COLOR_LIGHT_MAGENTA </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>13</span><span style=color:#eceff4>,
+</span><span>	VGA_COLOR_LIGHT_BROWN </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>14</span><span style=color:#eceff4>,
+</span><span>	VGA_COLOR_WHITE </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>15
+</span><span>}</span><span style=color:#eceff4>;
+</span><span>
+</span><span style=color:#616e88>// this function combines the foreground and background color
+</span><span style=color:#616e88>// to 8 color bits used by vga text mode.
+</span><span style=color:#81a1c1>static inline </span><span style=color:#8fbcbb>uint8_t </span><span style=color:#88c0d0>vga_entry_color</span><span>(vga_color fg</span><span style=color:#eceff4>,</span><span> vga_color bg) {
+</span><span>	</span><span style=color:#81a1c1>return static_cast</span><span><</span><span style=color:#8fbcbb>uint8_t</span><span>>(fg) </span><span style=color:#81a1c1>| static_cast</span><span><</span><span style=color:#8fbcbb>uint8_t</span><span>>(bg) </span><span style=color:#81a1c1><< </span><span style=color:#b48ead>4</span><span style=color:#eceff4>;
+</span><span>}
+</span><span>
+</span><span style=color:#616e88>// the 8 bit colors bits are then left shifted 8 bits to make room for charachter
+</span><span style=color:#616e88>// bits which is combined to be put in vga buffer.
+</span><span style=color:#81a1c1>static inline </span><span style=color:#8fbcbb>uint16_t </span><span style=color:#88c0d0>vga_entry</span><span>(</span><span style=color:#81a1c1>unsigned char </span><span>uc</span><span style=color:#eceff4>, </span><span style=color:#8fbcbb>uint8_t </span><span>color) {
+</span><span>	</span><span style=color:#81a1c1>return static_cast</span><span><</span><span style=color:#8fbcbb>uint16_t</span><span>>(uc) </span><span style=color:#81a1c1>| static_cast</span><span><</span><span style=color:#8fbcbb>uint16_t</span><span>>(color) </span><span style=color:#81a1c1><< </span><span style=color:#b48ead>8</span><span style=color:#eceff4>;
+</span><span>}
+</span><span>
+</span><span style=color:#616e88>// I don't think I need to explain this
+</span><span style=color:#8fbcbb>size_t </span><span style=color:#88c0d0>strlen</span><span>(</span><span style=color:#81a1c1>const char* </span><span>str) {
+</span><span>	</span><span style=color:#8fbcbb>size_t</span><span> len </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>0</span><span style=color:#eceff4>;
+</span><span>	</span><span style=color:#81a1c1>while</span><span>(str[len]) {
+</span><span>	len</span><span style=color:#81a1c1>++</span><span style=color:#eceff4>;
+</span><span>	}
+</span><span>	</span><span style=color:#81a1c1>return</span><span> len</span><span style=color:#eceff4>;
+</span><span>}
+</span><span>
+</span><span style=color:#616e88>// set the size of vga rectangular grid to be used
+</span><span style=color:#81a1c1>static const </span><span style=color:#8fbcbb>size_t</span><span> VGA_WIDTH </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>80</span><span style=color:#eceff4>;
+</span><span style=color:#81a1c1>static const </span><span style=color:#8fbcbb>size_t</span><span> VGA_HEIGHT </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>25</span><span style=color:#eceff4>;
+</span><span>
+</span><span style=color:#616e88>// global variables to be used for vga buffer and to keep
+</span><span style=color:#616e88>// track of current row, column and color
+</span><span style=color:#8fbcbb>size_t</span><span> terminal_row</span><span style=color:#eceff4>;
+</span><span style=color:#8fbcbb>size_t</span><span> terminal_column</span><span style=color:#eceff4>;
+</span><span style=color:#8fbcbb>uint8_t</span><span> terminal_color</span><span style=color:#eceff4>;
+</span><span style=color:#8fbcbb>uint16_t</span><span style=color:#81a1c1>*</span><span> terminal_buffer</span><span style=color:#eceff4>;
+</span><span>
+</span><span style=color:#616e88>// initialized the vga terminal
+</span><span style=color:#616e88>// the address 0xB8000 represents the starting address of the video memory buffer.
+</span><span style=color:#81a1c1>void </span><span style=color:#88c0d0>terminal_initialize</span><span>(</span><span style=color:#81a1c1>void</span><span>) {
+</span><span>	terminal_row </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>0</span><span style=color:#eceff4>;
+</span><span>	terminal_column </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>0</span><span style=color:#eceff4>;
+</span><span>	terminal_color </span><span style=color:#81a1c1>= </span><span style=color:#88c0d0>vga_entry_color</span><span>(vga_color</span><span style=color:#81a1c1>::</span><span>VGA_COLOR_LIGHT_GREY</span><span style=color:#eceff4>,</span><span> vga_color</span><span style=color:#81a1c1>::</span><span>VGA_COLOR_BLACK)</span><span style=color:#eceff4>;
+</span><span>	terminal_buffer </span><span style=color:#81a1c1>= reinterpret_cast</span><span><</span><span style=color:#8fbcbb>uint16_t</span><span style=color:#81a1c1>*</span><span>>(</span><span style=color:#b48ead>0xB8000</span><span>)</span><span style=color:#eceff4>;
+</span><span>	</span><span style=color:#81a1c1>for </span><span>(</span><span style=color:#8fbcbb>size_t</span><span> y </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>0</span><span style=color:#eceff4>;</span><span> y </span><span style=color:#81a1c1><</span><span> VGA_HEIGHT</span><span style=color:#eceff4>;</span><span> y</span><span style=color:#81a1c1>++</span><span>) {
+</span><span>		</span><span style=color:#81a1c1>for </span><span>(</span><span style=color:#8fbcbb>size_t</span><span> x </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>0</span><span style=color:#eceff4>;</span><span> x </span><span style=color:#81a1c1><</span><span> VGA_WIDTH</span><span style=color:#eceff4>;</span><span> x</span><span style=color:#81a1c1>++</span><span>) {
+</span><span>			</span><span style=color:#81a1c1>const </span><span style=color:#8fbcbb>size_t</span><span> index </span><span style=color:#81a1c1>=</span><span> y </span><span style=color:#81a1c1>*</span><span> VGA_WIDTH </span><span style=color:#81a1c1>+</span><span> x</span><span style=color:#eceff4>;
+</span><span>			terminal_buffer[index] </span><span style=color:#81a1c1>= </span><span style=color:#88c0d0>vga_entry</span><span>(</span><span style=color:#a3be8c>' '</span><span style=color:#eceff4>,</span><span> terminal_color)</span><span style=color:#eceff4>;
+</span><span>		}
+</span><span>	}
+</span><span>}
+</span><span>
+</span><span style=color:#81a1c1>void </span><span style=color:#88c0d0>terminal_setcolor</span><span>(</span><span style=color:#8fbcbb>uint8_t </span><span>color) {
+</span><span>	terminal_color </span><span style=color:#81a1c1>=</span><span> color</span><span style=color:#eceff4>;
+</span><span>}
+</span><span>
+</span><span style=color:#81a1c1>void </span><span style=color:#88c0d0>terminal_putentryat</span><span>(</span><span style=color:#81a1c1>char </span><span>c</span><span style=color:#eceff4>, </span><span style=color:#8fbcbb>uint8_t </span><span>color</span><span style=color:#eceff4>, </span><span style=color:#8fbcbb>size_t </span><span>x</span><span style=color:#eceff4>, </span><span style=color:#8fbcbb>size_t </span><span>y) {
+</span><span>	</span><span style=color:#81a1c1>const </span><span style=color:#8fbcbb>size_t</span><span> index </span><span style=color:#81a1c1>=</span><span> y </span><span style=color:#81a1c1>*</span><span> VGA_WIDTH </span><span style=color:#81a1c1>+</span><span> x</span><span style=color:#eceff4>;
+</span><span>	terminal_buffer[index] </span><span style=color:#81a1c1>= </span><span style=color:#88c0d0>vga_entry</span><span>(c</span><span style=color:#eceff4>,</span><span> color)</span><span style=color:#eceff4>;
+</span><span>}
+</span><span>
+</span><span style=color:#81a1c1>void </span><span style=color:#88c0d0>terminal_putchar</span><span>(</span><span style=color:#81a1c1>char </span><span>c) {
+</span><span>	</span><span style=color:#616e88>// vga doesn't have support for newline character. so if the new line
+</span><span>	</span><span style=color:#616e88>// character appears change to fisrt cell of next row
+</span><span>	</span><span style=color:#81a1c1>if </span><span>(c </span><span style=color:#81a1c1>== </span><span style=color:#a3be8c>'</span><span style=color:#ebcb8b>\n</span><span style=color:#a3be8c>'</span><span>) {
+</span><span>		terminal_row</span><span style=color:#81a1c1>++</span><span style=color:#eceff4>;
+</span><span>		terminal_column </span><span style=color:#81a1c1>=</span><span style=color:#b48ead>0</span><span style=color:#eceff4>;
+</span><span>	</span><span style=color:#81a1c1>return</span><span style=color:#eceff4>;
+</span><span>	}
+</span><span>	</span><span style=color:#88c0d0>terminal_putentryat</span><span>(c</span><span style=color:#eceff4>,</span><span> terminal_color</span><span style=color:#eceff4>,</span><span> terminal_column</span><span style=color:#eceff4>,</span><span> terminal_row)</span><span style=color:#eceff4>;
+</span><span>	</span><span style=color:#616e88>// if the width is reached change the return the cursor to start of next row
+</span><span>	</span><span style=color:#81a1c1>if </span><span>(</span><span style=color:#81a1c1>++</span><span>terminal_column </span><span style=color:#81a1c1>==</span><span> VGA_WIDTH) {
+</span><span>		terminal_column </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>0</span><span style=color:#eceff4>;
+</span><span>		</span><span style=color:#616e88>// if the max row is reached go to the starting row
+</span><span>		</span><span style=color:#81a1c1>if </span><span>(</span><span style=color:#81a1c1>++</span><span>terminal_row </span><span style=color:#81a1c1>==</span><span> VGA_HEIGHT)
+</span><span>			terminal_row </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>0</span><span style=color:#eceff4>;
+</span><span>	}
+</span><span>}
+</span><span>
+</span><span style=color:#81a1c1>void </span><span style=color:#88c0d0>terminal_write</span><span>(</span><span style=color:#81a1c1>const char* </span><span>data</span><span style=color:#eceff4>, </span><span style=color:#8fbcbb>size_t </span><span>size) {
+</span><span>	</span><span style=color:#81a1c1>for </span><span>(</span><span style=color:#8fbcbb>size_t</span><span> i </span><span style=color:#81a1c1>= </span><span style=color:#b48ead>0</span><span style=color:#eceff4>;</span><span> i </span><span style=color:#81a1c1><</span><span> size</span><span style=color:#eceff4>;</span><span> i</span><span style=color:#81a1c1>++</span><span>) {
+</span><span>		</span><span style=color:#8fbcbb>uint8_t</span><span> clr </span><span style=color:#81a1c1>= </span><span style=color:#88c0d0>vga_entry_color</span><span>(</span><span style=color:#81a1c1>static_cast</span><span>&LTvga_color>(i</span><span style=color:#81a1c1>%</span><span style=color:#b48ead>15</span><span style=color:#81a1c1>+</span><span style=color:#b48ead>1</span><span>)</span><span style=color:#eceff4>,</span><span> vga_color</span><span style=color:#81a1c1>::</span><span>VGA_COLOR_BLACK)</span><span style=color:#eceff4>;
+</span><span>		</span><span style=color:#88c0d0>terminal_setcolor</span><span>(clr)</span><span style=color:#eceff4>;
+</span><span>		</span><span style=color:#88c0d0>terminal_putchar</span><span>(data[i])</span><span style=color:#eceff4>;
+</span><span>	}
+</span><span>}
+</span><span>
+</span><span style=color:#81a1c1>void </span><span style=color:#88c0d0>terminal_writestring</span><span>(</span><span style=color:#81a1c1>const char* </span><span>data) {
+</span><span>	</span><span style=color:#88c0d0>terminal_write</span><span>(data</span><span style=color:#eceff4>, </span><span style=color:#88c0d0>strlen</span><span>(data))</span><span style=color:#eceff4>;
+</span><span>}
+</span><span>
+</span><span style=color:#81a1c1>extern </span><span style=color:#a3be8c>"C" </span><span style=color:#81a1c1>void </span><span style=color:#88c0d0>kernel_main</span><span>() {
+</span><span>	</span><span style=color:#616e88>// Initialize terminal interface
+</span><span>	</span><span style=color:#88c0d0>terminal_initialize</span><span>()</span><span style=color:#eceff4>;
+</span><span>	</span><span style=color:#88c0d0>terminal_writestring</span><span>(</span><span style=color:#a3be8c>"Hello, kernel World!</span><span style=color:#ebcb8b>\n</span><span style=color:#a3be8c>Yooooo New line support baby!!!"</span><span>)</span><span style=color:#eceff4>;
+</span><span>}
+</span></code></pre><h3 id=compiling-the-code>Compiling the code</h3><p>The cross compiler we compiled will now be used to compile this code. To compile it:<pre class=language-bash data-lang=bash style=background:#2e3440;color:#d8dee9><code class=language-bash data-lang=bash><span style=color:#88c0d0>i686-elf-g++</span><span> -c kernel.cpp -o kernel.o -ffreestanding -02 -wall -fno-exceptions -fno-rtti
+</span></code></pre><h2 id=assembly>Assembly</h2><p>We are now going to write an assembly code that serves as a entry point for the kernel by initializing some stuff.<h3 id=multiboot-section>multiboot section</h3><pre class=language-asm data-lang=asm style=background:#2e3440;color:#d8dee9><code class=language-asm data-lang=asm><span style=color:#88c0d0>.set ALIGN</span><span>, 1</span><span style=color:#88c0d0><<</span><span>0
+</span><span style=color:#88c0d0>.set MEMINFO</span><span>, 1</span><span style=color:#88c0d0><<</span><span>1
+</span><span style=color:#88c0d0>.set </span><span>FLAGS, </span><span style=color:#88c0d0>ALIGN | MEMINFO
+</span><span style=color:#88c0d0>.set MAGIC</span><span>, 0x1BADB002
+</span><span style=color:#88c0d0>.set CHECKSUM</span><span>, -</span><span style=color:#88c0d0>(MAGIC </span><span>+ FLAGS</span><span style=color:#88c0d0>)
+</span><span>
+</span><span style=color:#88c0d0>.section .multiboot
+</span><span style=color:#88c0d0>.align </span><span>4
+</span><span style=color:#88c0d0>.long MAGIC
+</span><span style=color:#88c0d0>.long </span><span>FLAGS
+</span><span style=color:#88c0d0>.long CHECKSUM
+</span></code></pre><p>we are defining some constants used in multiboot header and then defining multiboot section and populating with necessary values. The above code helps bootloader to confirm our kernel as multiboot compliant and validate headers integrity. This is done as per multiboot specification.<h3 id=bss-section>bss section</h3><pre class=language-asm data-lang=asm style=background:#2e3440;color:#d8dee9><code class=language-asm data-lang=asm><span style=color:#88c0d0>.section .bss
+</span><span style=color:#88c0d0>.align </span><span>16
+</span><span style=color:#88c0d0>stack_bottom:
+</span><span style=color:#88c0d0>.skip </span><span>16384
+</span><span style=color:#88c0d0>stack_top:
+</span></code></pre><p>the multiboot specification doesn't define the value of stack pointer register, so its upto ther kernel to provide a stack. the above code provides a 16KB stack from stack_bottom to stack_top. The align 16 is necessary because the stack on x86 must be 16-byte aligned accordind to System V ABI standrad.<h3 id=text-section>text section</h3><pre class=language-asm data-lang=asm style=background:#2e3440;color:#d8dee9><code class=language-asm data-lang=asm><span style=color:#88c0d0>.section .text
+</span><span style=color:#88c0d0>.global _start
+</span><span style=color:#88c0d0>.type _start</span><span>, </span><span style=color:#88c0d0>@function
+</span><span style=color:#88c0d0>_start:
+</span><span style=color:#88c0d0>    </span><span style=color:#81a1c1>mov </span><span style=color:#88c0d0>$stack_top</span><span>, </span><span style=color:#88c0d0>%</span><span>esp
+</span><span style=color:#88c0d0>    </span><span style=color:#81a1c1>call </span><span style=color:#88c0d0>kernel_main
+</span><span style=color:#81a1c1>cli
+</span><span>1</span><span style=color:#88c0d0>: </span><span style=color:#81a1c1>hlt
+</span><span style=color:#81a1c1>jmp </span><span>1b
+</span><span style=color:#88c0d0>.size _start</span><span>, </span><span style=color:#88c0d0>. </span><span>- </span><span style=color:#88c0d0>_start
+</span><span>
+</span></code></pre><p>It defines the text section which contains executable instruction. We well be defining the _start as the entry point in our linker script. _start sets the stack pointer (%esp) to the top of the stack and then calls the main function of our c++ program. After kernel_main function returns, cli instruction disables the hardware interrupts and hlt and jmp instruction puts the cpu in infinite loop.<p>The last line sets the size of the _start symbol to the current location '.' minus its start. This is useful when debugging or when you implement call tracing.<p>save the above code in boot.s file and the assemble it as:<pre class=language-bash data-lang=bash style=background:#2e3440;color:#d8dee9><code class=language-bash data-lang=bash><span style=color:#88c0d0>i686-elf-as</span><span> boot.s -o boot.o
+</span></code></pre><h2 id=linking-the-kernel>Linking the kernel</h2><p>We now have seperate boot and kernel object files which we need to link to make a final kernel which can be used by bootloader. The default linker scripts is not suitable for this so we will write our own linker script.<pre class=language-ld data-lang=ld style=background:#2e3440;color:#d8dee9><code class=language-ld data-lang=ld><span style=color:#616e88>/*defines the _start function as entry point into our kernel_*/
+</span><span style=color:#81a1c1>ENTRY</span><span>(_start)
+</span><span>
+</span><span style=color:#616e88>/*defines the sections and their location*/
+</span><span style=color:#81a1c1>SECTIONS</span><span> {
+</span><span>	</span><span style=color:#616e88>/*current memory location at 1 MB. conventional place for bootloader 
+</span><span style=color:#616e88>	to load kernel*/ 
+</span><span>    </span><span style=color:#81a1c1>.</span><span> = </span><span style=color:#b48ead>1M</span><span>;
+</span><span>	</span><span style=color:#616e88>/*defines the code section of the program. should be aligned to a 4K boundary and that it should be split into blocks of 4K. multiboot section should be first otherwise bootloader won't recognize the file format.
+</span><span style=color:#616e88>    .text BLOCK(4K) : ALIGN(4K)
+</span><span style=color:#616e88>	{
+</span><span style=color:#616e88>		*(.multiboot)
+</span><span style=color:#616e88>		*(.text)
+</span><span style=color:#616e88>	}
+</span><span style=color:#616e88>
+</span><span style=color:#616e88>    /* Read-only data. */
+</span><span>	.rodata </span><span style=color:#81a1c1>BLOCK</span><span>(</span><span style=color:#b48ead>4K</span><span>) : </span><span style=color:#81a1c1>ALIGN</span><span>(</span><span style=color:#b48ead>4K</span><span>)
+</span><span>	{
+</span><span>		*(.rodata)
+</span><span>	}
+</span><span> 
+</span><span>	</span><span style=color:#616e88>/* Read-write data (initialized) */
+</span><span>	.data </span><span style=color:#81a1c1>BLOCK</span><span>(</span><span style=color:#b48ead>4K</span><span>) : </span><span style=color:#81a1c1>ALIGN</span><span>(</span><span style=color:#b48ead>4K</span><span>)
+</span><span>	{
+</span><span>		*(.data)
+</span><span>	}
+</span><span> 
+</span><span>	</span><span style=color:#616e88>/* Read-write data (uninitialized) and stack */
+</span><span>    .bss </span><span style=color:#81a1c1>BLOCK</span><span>(</span><span style=color:#b48ead>4K</span><span>) : </span><span style=color:#81a1c1>ALIGN</span><span>(</span><span style=color:#b48ead>4K</span><span>)
+</span><span>	{
+</span><span>		*(COMMON)
+</span><span>		*(.bss)
+</span><span>	}
+</span><span>}
+</span></code></pre><p>to link the kernel we do:<pre class=language-bash data-lang=bash style=background:#2e3440;color:#d8dee9><code class=language-bash data-lang=bash><span style=color:#88c0d0>i686-elf-gcc</span><span> -T linker.ld -o myos.bin -ffreestanding -02 -nostdlib boot.o kernel.o -lgcc
+</span></code></pre><h2 id=running-the-kernel>Running the kernel</h2><p>to run the kernel on qemu:<pre class=language-bash data-lang=bash style=background:#2e3440;color:#d8dee9><code class=language-bash data-lang=bash><span style=color:#88c0d0>qemu-system-i386</span><span> -kernel myos.bin
+</span></code></pre><img src=/res/blogs/Screenshot_2023-06-15_13-42-21.png><blockquote class=note id=cc_license><i class="ri-creative-commons-line ri-lg"></i><div class=content><p>This work is licensed under <a rel="nofollow noreferrer" href=http://creativecommons.org/licenses/by-nc-sa/4.0/>CC BY-NC-SA 4.0</a>.</div></blockquote></article></main><aside class=blur><nav><ul><li><a class=toc-h2 href=#intro>Intro</a><li><a class=toc-h2 href=#before-we-get-started>Before we get started</a> <ul><li><a class=toc-h3 href=#cross-compiler>Cross compiler</a><li><a class=toc-h3 href=#booting-the-system>Booting the system</a><li><a class=toc-h3 href=#freestanding-and-hosted>Freestanding and Hosted</a></ul><li><a class=toc-h2 href=#writing-the-kernel>Writing the Kernel</a> <ul><li><a class=toc-h3 href=#understanding-vga-text-mode>Understanding VGA text mode</a><li><a class=toc-h3 href=#compiling-the-code>Compiling the code</a></ul><li><a class=toc-h2 href=#assembly>Assembly</a> <ul><li><a class=toc-h3 href=#multiboot-section>multiboot section</a><li><a class=toc-h3 href=#bss-section>bss section</a><li><a class=toc-h3 href=#text-section>text section</a></ul><li><a class=toc-h2 href=#linking-the-kernel>Linking the kernel</a><li><a class=toc-h2 href=#running-the-kernel>Running the kernel</a></ul></nav><a aria-label="back to top" href=#top id=back-to-top><i class="ri-arrow-up-s-line ri-2x"></i></a></aside></div><footer><div class=copyright>Copyright © 2022 faultypointer. All rights reserved.</div><div class=credits><span>Powered by <a rel="noreferrer noopener" href=https://www.getzola.org/ target=_blank>Zola</a> and <a rel="noreferrer noopener" href=https://github.com/isunjn/serene target=_blank>Serene</a></span></div></footer><script src=/js/dark.js></script><script src=/js/outdate.js></script><script src=/js/toc.js></script><script src=/js/progress.js></script><script src=/js/lightense.min.js></script><script src=/js/img.js></script>

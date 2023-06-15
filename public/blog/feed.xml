@@ -4,8 +4,313 @@
 	<subtitle>My blog page</subtitle>
 	<link href="https://faultypointer.netlify.app/blog/feed.xml" rel="self" type="application/atom+xml"/>
     <link href="https://faultypointer.netlify.app/blog/"/>
-	<updated>2023-06-14T00:00:00+00:00</updated>
+	<updated>2023-06-15T00:00:00+00:00</updated>
 	<id>https://faultypointer.netlify.app/blog/feed.xml</id>
+	<entry xml:lang="en">
+		<title>Building A Hello World Kernel</title>
+		<published>2023-06-15T00:00:00+00:00</published>
+		<updated>2023-06-15T00:00:00+00:00</updated>
+		<link href="https://faultypointer.netlify.app/blog/jttcoos-building-a-hello-world-kernel/" type="text/html"/>
+		<id>https://faultypointer.netlify.app/blog/jttcoos-building-a-hello-world-kernel/</id>
+		<content type="html">&lt;h2 id=&quot;intro&quot;&gt;Intro&lt;&#x2F;h2&gt;
+&lt;p&gt;Reading about the workings and development of operating system is fascinating but there is still something missing. Getting your hands dirty with the code and racking your brain over something for hours only to give up and copying some code is way more interesting. Needless to say you shouldn&#x27;t give up reading the theory — maybe you can? who am I to say. I am just getting started myself.&lt;&#x2F;p&gt;
+&lt;p&gt;Reading theory and writing code in parallel is the way I like to do things .That is what I am gonna do. And obviously the best way to start is to write a hello world kernel. By write I mean copy it from &lt;a rel=&quot;nofollow noreferrer&quot; href=&quot;https:&#x2F;&#x2F;wiki.osdev.org&#x2F;Main_Page&quot;&gt;OSDevWiki&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;before-we-get-started&quot;&gt;Before we get started&lt;&#x2F;h2&gt;
+&lt;p&gt;there are few things that we should know about so that atleast we understand what is going on rather than mindlessly following the guide.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;cross-compiler&quot;&gt;Cross compiler&lt;&#x2F;h3&gt;
+&lt;p&gt;Its a compiler that runs on a system(called Host) but generated the executable for another system(called Target. I am gonna show how I installed the GNU cross compiler for i686 system on linux so if you are on windows or mac get rekt. But also you can go to &lt;a rel=&quot;nofollow noreferrer&quot; href=&quot;https:&#x2F;&#x2F;wiki.osdev.org&#x2F;Building_GCC&quot;&gt;osdevwiki&lt;&#x2F;a&gt; to see how to build it on other system.&lt;&#x2F;p&gt;
+&lt;ol&gt;
+&lt;li&gt;Installing the dependencies&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;sudo&lt;&#x2F;span&gt;&lt;span&gt; dnf install gcc g++ make bison flex gmp-devel libmpc-devel mpfr-devel texinfo cloog-devel isl-devel
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;ol start=&quot;2&quot;&gt;
+&lt;li&gt;Download and extract the source code
+download the source code from &lt;a rel=&quot;nofollow noreferrer&quot; href=&quot;https:&#x2F;&#x2F;ftp.gnu.org&#x2F;gnu&#x2F;binutils&#x2F;&quot;&gt;binutils&lt;&#x2F;a&gt; and &lt;a rel=&quot;nofollow noreferrer&quot; href=&quot;https:&#x2F;&#x2F;ftp.gnu.org&#x2F;gnu&#x2F;gcc&#x2F;&quot;&gt;gcc&lt;&#x2F;a&gt; and put them where you like for eg ~&#x2F;src.&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;cd &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;~&lt;&#x2F;span&gt;&lt;span&gt;&#x2F;src
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;tar&lt;&#x2F;span&gt;&lt;span&gt; xf gcc.x.stuff binutils.x.stuff
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;ol start=&quot;3&quot;&gt;
+&lt;li&gt;Preparation
+decide where to install the binaries and for which system. ~&#x2F;opt&#x2F; should be a good place to install. since i am compiling for i686, target system will be i686-elf&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;export &lt;&#x2F;span&gt;&lt;span&gt;PREFIX&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;HOME&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&#x2F;opt&#x2F;&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;export &lt;&#x2F;span&gt;&lt;span&gt;TARGET&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;i686-elf
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;ol start=&quot;4&quot;&gt;
+&lt;li&gt;Installing Binutils&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;cd &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;~&lt;&#x2F;span&gt;&lt;span&gt;&#x2F;src&#x2F;binutils.x.stuff
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;mkdir&lt;&#x2F;span&gt;&lt;span&gt; build &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;amp;&amp;amp; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;cd&lt;&#x2F;span&gt;&lt;span&gt; build
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;..&#x2F;configure&lt;&#x2F;span&gt;&lt;span&gt; --prefix&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;PREFIX&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt; --target&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;TARGET&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt; --disable-nls --disable-werror
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;make
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;make&lt;&#x2F;span&gt;&lt;span&gt; install
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;ol start=&quot;5&quot;&gt;
+&lt;li&gt;Installing GCC&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;cd &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;~&lt;&#x2F;span&gt;&lt;span&gt;&#x2F;src&#x2F;gcc.x.stuff
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;mkdir&lt;&#x2F;span&gt;&lt;span&gt; build &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;amp;&amp;amp; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;cd&lt;&#x2F;span&gt;&lt;span&gt; build
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;..&#x2F;configure&lt;&#x2F;span&gt;&lt;span&gt; --prefix&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;PREFIX&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt; --target&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;TARGET&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt; --disable-nls --enable-language&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span&gt;c,c++
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;make&lt;&#x2F;span&gt;&lt;span&gt; all-gcc
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;make&lt;&#x2F;span&gt;&lt;span&gt; all-target-libgcc 
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;make&lt;&#x2F;span&gt;&lt;span&gt; install-gcc
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;make&lt;&#x2F;span&gt;&lt;span&gt; install-target-libgcc
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;ol start=&quot;5&quot;&gt;
+&lt;li&gt;adding to path
+add this to the .bashrc&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;export &lt;&#x2F;span&gt;&lt;span&gt;PATH&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;HOME&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&#x2F;opt&#x2F;bin&#x2F;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;PATH&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h3 id=&quot;booting-the-system&quot;&gt;Booting the system&lt;&#x2F;h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Existing piece of software is required to load our operating system which is called the bootloader. Popular bootloaders are GRUB, limine.&lt;&#x2F;li&gt;
+&lt;li&gt;Bootloader follows a certain protocol that outlines the communication and data exchange between the bootloader, firmware and the kernel.&lt;&#x2F;li&gt;
+&lt;li&gt;Multiboot is one such protocol. It enables the bootloader to pass important information line memory map, command line arguments and other details to the kernel.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h3 id=&quot;freestanding-and-hosted&quot;&gt;Freestanding and Hosted&lt;&#x2F;h3&gt;
+&lt;p&gt;A hosted binary is an executable that is compiled to run on a specific system. It relies on standrad library provided by the host system.&lt;&#x2F;p&gt;
+&lt;p&gt;A freestanding binary is one that is compiled without a specific system in mind. As such it can&#x27;t use the standrad library features.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;writing-the-kernel&quot;&gt;Writing the Kernel&lt;&#x2F;h2&gt;
+&lt;p&gt;Since we are writing a kernel that prints hello world on screen without using standrad library features, we will have to make use of vga text mode. Video Graphics Array(vga) text mode is a display mode that is supported by most modern computer. &lt;&#x2F;p&gt;
+&lt;h3 id=&quot;understanding-vga-text-mode&quot;&gt;Understanding VGA text mode&lt;&#x2F;h3&gt;
+&lt;p&gt;In VGA text mode, the screen is divided into a rectangular grid of fixed-size character cells. Each cell can display a single character from the ASCII character set and is associated with a specific foreground and background color.&lt;&#x2F;p&gt;
+&lt;p&gt;Each screen character is represented by 16 bits accessible by the cpu. The 8 least significant bits are character bits that represent ascii character, 9th to 12th bits are for foreground color and rest of the bits are for background color. Depending on the mode setup, the most significant bit might be blink bit.&lt;&#x2F;p&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Background&lt;&#x2F;th&gt;&lt;th&gt;Foreground&lt;&#x2F;th&gt;&lt;th&gt;Character&lt;&#x2F;th&gt;&lt;&#x2F;tr&gt;&lt;&#x2F;thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;0  0  0  0&lt;&#x2F;td&gt;&lt;td&gt;0  0  0  0&lt;&#x2F;td&gt;&lt;td&gt;0 0 0 0 0 0 0 0&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;&#x2F;tbody&gt;&lt;&#x2F;table&gt;
+&lt;h4 id=&quot;vga-color-palette&quot;&gt;VGA Color palette&lt;&#x2F;h4&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Color&lt;&#x2F;th&gt;&lt;th&gt;integer&lt;&#x2F;th&gt;&lt;th&gt;binary&lt;&#x2F;th&gt;&lt;&#x2F;tr&gt;&lt;&#x2F;thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;black&lt;&#x2F;td&gt;&lt;td&gt;0&lt;&#x2F;td&gt;&lt;td&gt;0000&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;blue&lt;&#x2F;td&gt;&lt;td&gt;1&lt;&#x2F;td&gt;&lt;td&gt;0001&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;green&lt;&#x2F;td&gt;&lt;td&gt;2&lt;&#x2F;td&gt;&lt;td&gt;0010&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;cyan&lt;&#x2F;td&gt;&lt;td&gt;3&lt;&#x2F;td&gt;&lt;td&gt;0011&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;red&lt;&#x2F;td&gt;&lt;td&gt;4&lt;&#x2F;td&gt;&lt;td&gt;0100&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;magenta&lt;&#x2F;td&gt;&lt;td&gt;5&lt;&#x2F;td&gt;&lt;td&gt;0101&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;brown&lt;&#x2F;td&gt;&lt;td&gt;6&lt;&#x2F;td&gt;&lt;td&gt;0110&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;light grey&lt;&#x2F;td&gt;&lt;td&gt;7&lt;&#x2F;td&gt;&lt;td&gt;0111&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;dark grey&lt;&#x2F;td&gt;&lt;td&gt;8&lt;&#x2F;td&gt;&lt;td&gt;1000&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;light blue&lt;&#x2F;td&gt;&lt;td&gt;9&lt;&#x2F;td&gt;&lt;td&gt;1001&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;light green&lt;&#x2F;td&gt;&lt;td&gt;10&lt;&#x2F;td&gt;&lt;td&gt;1010&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;light cyan&lt;&#x2F;td&gt;&lt;td&gt;11&lt;&#x2F;td&gt;&lt;td&gt;1011&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;light red&lt;&#x2F;td&gt;&lt;td&gt;12&lt;&#x2F;td&gt;&lt;td&gt;1100&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;light magenta&lt;&#x2F;td&gt;&lt;td&gt;13&lt;&#x2F;td&gt;&lt;td&gt;1101&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;light brown&lt;&#x2F;td&gt;&lt;td&gt;14&lt;&#x2F;td&gt;&lt;td&gt;1110&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;white&lt;&#x2F;td&gt;&lt;td&gt;15&lt;&#x2F;td&gt;&lt;td&gt;1111&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;&#x2F;tbody&gt;&lt;&#x2F;table&gt;
+&lt;p&gt;so if you want to print white coloured &#x27;H&#x27; on black background you would have to write this 16 bit sequence at the appropriate buffer index.
+0 0 0 0  |  1 1 1 1  |  0 1 0 0 1 0 0 0
+Black bg  | white fg  | &#x27;H&#x27; ascii 72&lt;&#x2F;p&gt;
+&lt;p&gt;with this knowledge lets write a kernel that prints hello world on screen.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;cpp&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-cpp &quot;&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span style=&quot;color:#5e81ac;&quot;&gt;#include &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;lt;stdint.h&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; stuff like size_t, uint8_t etc
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#5e81ac;&quot;&gt;#include &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;lt;stddef.h&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; vga color palettes
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;enum class &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;vga_color &lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;uint8_t &lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;	VGA_COLOR_BLACK &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;	VGA_COLOR_BLUE &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;	VGA_COLOR_GREEN &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;2&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;	VGA_COLOR_CYAN &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;3&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;	VGA_COLOR_RED &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;4&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;	VGA_COLOR_MAGENTA &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;5&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;	VGA_COLOR_BROWN &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;6&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;	VGA_COLOR_LIGHT_GREY &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;7&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;	VGA_COLOR_DARK_GREY &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;8&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;	VGA_COLOR_LIGHT_BLUE &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;9&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;	VGA_COLOR_LIGHT_GREEN &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;10&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;	VGA_COLOR_LIGHT_CYAN &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;11&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;	VGA_COLOR_LIGHT_RED &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;12&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;	VGA_COLOR_LIGHT_MAGENTA &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;13&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;	VGA_COLOR_LIGHT_BROWN &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;14&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;	VGA_COLOR_WHITE &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;15
+&lt;&#x2F;span&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; this function combines the foreground and background color
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; to 8 color bits used by vga text mode.
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;static inline &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;uint8_t &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;vga_entry_color&lt;&#x2F;span&gt;&lt;span&gt;(vga_color fg&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,&lt;&#x2F;span&gt;&lt;span&gt; vga_color bg) {
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;return static_cast&lt;&#x2F;span&gt;&lt;span&gt;&amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;uint8_t&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;(fg) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;| static_cast&lt;&#x2F;span&gt;&lt;span&gt;&amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;uint8_t&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;(bg) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;lt;&amp;lt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;4&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; the 8 bit colors bits are then left shifted 8 bits to make room for charachter
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; bits which is combined to be put in vga buffer.
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;static inline &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;uint16_t &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;vga_entry&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;unsigned char &lt;&#x2F;span&gt;&lt;span&gt;uc&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;uint8_t &lt;&#x2F;span&gt;&lt;span&gt;color) {
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;return static_cast&lt;&#x2F;span&gt;&lt;span&gt;&amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;uint16_t&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;(uc) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;| static_cast&lt;&#x2F;span&gt;&lt;span&gt;&amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;uint16_t&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;(color) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;lt;&amp;lt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;8&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; I don&amp;#39;t think I need to explain this
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;size_t &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;strlen&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;const char* &lt;&#x2F;span&gt;&lt;span&gt;str) {
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;size_t&lt;&#x2F;span&gt;&lt;span&gt; len &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;while&lt;&#x2F;span&gt;&lt;span&gt;(str[len]) {
+&lt;&#x2F;span&gt;&lt;span&gt;	len&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;++&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;	}
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;return&lt;&#x2F;span&gt;&lt;span&gt; len&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; set the size of vga rectangular grid to be used
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;static const &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;size_t&lt;&#x2F;span&gt;&lt;span&gt; VGA_WIDTH &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;80&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;static const &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;size_t&lt;&#x2F;span&gt;&lt;span&gt; VGA_HEIGHT &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;25&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; global variables to be used for vga buffer and to keep
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; track of current row, column and color
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;size_t&lt;&#x2F;span&gt;&lt;span&gt; terminal_row&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;size_t&lt;&#x2F;span&gt;&lt;span&gt; terminal_column&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;uint8_t&lt;&#x2F;span&gt;&lt;span&gt; terminal_color&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;uint16_t&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*&lt;&#x2F;span&gt;&lt;span&gt; terminal_buffer&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; initialized the vga terminal
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; the address 0xB8000 represents the starting address of the video memory buffer.
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;void &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;terminal_initialize&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;void&lt;&#x2F;span&gt;&lt;span&gt;) {
+&lt;&#x2F;span&gt;&lt;span&gt;	terminal_row &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;	terminal_column &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;	terminal_color &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;vga_entry_color&lt;&#x2F;span&gt;&lt;span&gt;(vga_color&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;::&lt;&#x2F;span&gt;&lt;span&gt;VGA_COLOR_LIGHT_GREY&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,&lt;&#x2F;span&gt;&lt;span&gt; vga_color&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;::&lt;&#x2F;span&gt;&lt;span&gt;VGA_COLOR_BLACK)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;	terminal_buffer &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= reinterpret_cast&lt;&#x2F;span&gt;&lt;span&gt;&amp;lt;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;uint16_t&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*&lt;&#x2F;span&gt;&lt;span&gt;&amp;gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0xB8000&lt;&#x2F;span&gt;&lt;span&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;for &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;size_t&lt;&#x2F;span&gt;&lt;span&gt; y &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;&lt;&#x2F;span&gt;&lt;span&gt; y &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;lt;&lt;&#x2F;span&gt;&lt;span&gt; VGA_HEIGHT&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;&lt;&#x2F;span&gt;&lt;span&gt; y&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;++&lt;&#x2F;span&gt;&lt;span&gt;) {
+&lt;&#x2F;span&gt;&lt;span&gt;		&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;for &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;size_t&lt;&#x2F;span&gt;&lt;span&gt; x &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;&lt;&#x2F;span&gt;&lt;span&gt; x &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;lt;&lt;&#x2F;span&gt;&lt;span&gt; VGA_WIDTH&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;&lt;&#x2F;span&gt;&lt;span&gt; x&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;++&lt;&#x2F;span&gt;&lt;span&gt;) {
+&lt;&#x2F;span&gt;&lt;span&gt;			&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;const &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;size_t&lt;&#x2F;span&gt;&lt;span&gt; index &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span&gt; y &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*&lt;&#x2F;span&gt;&lt;span&gt; VGA_WIDTH &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;+&lt;&#x2F;span&gt;&lt;span&gt; x&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;			terminal_buffer[index] &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;vga_entry&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;#39; &amp;#39;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,&lt;&#x2F;span&gt;&lt;span&gt; terminal_color)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;		}
+&lt;&#x2F;span&gt;&lt;span&gt;	}
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;void &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;terminal_setcolor&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;uint8_t &lt;&#x2F;span&gt;&lt;span&gt;color) {
+&lt;&#x2F;span&gt;&lt;span&gt;	terminal_color &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span&gt; color&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;void &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;terminal_putentryat&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;char &lt;&#x2F;span&gt;&lt;span&gt;c&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;uint8_t &lt;&#x2F;span&gt;&lt;span&gt;color&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;size_t &lt;&#x2F;span&gt;&lt;span&gt;x&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;size_t &lt;&#x2F;span&gt;&lt;span&gt;y) {
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;const &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;size_t&lt;&#x2F;span&gt;&lt;span&gt; index &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span&gt; y &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*&lt;&#x2F;span&gt;&lt;span&gt; VGA_WIDTH &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;+&lt;&#x2F;span&gt;&lt;span&gt; x&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;	terminal_buffer[index] &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;vga_entry&lt;&#x2F;span&gt;&lt;span&gt;(c&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,&lt;&#x2F;span&gt;&lt;span&gt; color)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;void &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;terminal_putchar&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;char &lt;&#x2F;span&gt;&lt;span&gt;c) {
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; vga doesn&amp;#39;t have support for newline character. so if the new line
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; character appears change to fisrt cell of next row
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;(c &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;== &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;#39;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ebcb8b;&quot;&gt;\n&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;) {
+&lt;&#x2F;span&gt;&lt;span&gt;		terminal_row&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;++&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;		terminal_column &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;return&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;	}
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;terminal_putentryat&lt;&#x2F;span&gt;&lt;span&gt;(c&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,&lt;&#x2F;span&gt;&lt;span&gt; terminal_color&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,&lt;&#x2F;span&gt;&lt;span&gt; terminal_column&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,&lt;&#x2F;span&gt;&lt;span&gt; terminal_row)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; if the width is reached change the return the cursor to start of next row
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;++&lt;&#x2F;span&gt;&lt;span&gt;terminal_column &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;==&lt;&#x2F;span&gt;&lt;span&gt; VGA_WIDTH) {
+&lt;&#x2F;span&gt;&lt;span&gt;		terminal_column &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;		&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; if the max row is reached go to the starting row
+&lt;&#x2F;span&gt;&lt;span&gt;		&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;if &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;++&lt;&#x2F;span&gt;&lt;span&gt;terminal_row &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;==&lt;&#x2F;span&gt;&lt;span&gt; VGA_HEIGHT)
+&lt;&#x2F;span&gt;&lt;span&gt;			terminal_row &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;	}
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;void &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;terminal_write&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;const char* &lt;&#x2F;span&gt;&lt;span&gt;data&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;size_t &lt;&#x2F;span&gt;&lt;span&gt;size) {
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;for &lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;size_t&lt;&#x2F;span&gt;&lt;span&gt; i &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;0&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;&lt;&#x2F;span&gt;&lt;span&gt; i &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;&amp;lt;&lt;&#x2F;span&gt;&lt;span&gt; size&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;&lt;&#x2F;span&gt;&lt;span&gt; i&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;++&lt;&#x2F;span&gt;&lt;span&gt;) {
+&lt;&#x2F;span&gt;&lt;span&gt;		&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;uint8_t&lt;&#x2F;span&gt;&lt;span&gt; clr &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;vga_entry_color&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;static_cast&lt;&#x2F;span&gt;&lt;span&gt;&amp;lt;vga_color&amp;gt;(i&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;%&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;15&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;1&lt;&#x2F;span&gt;&lt;span&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,&lt;&#x2F;span&gt;&lt;span&gt; vga_color&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;::&lt;&#x2F;span&gt;&lt;span&gt;VGA_COLOR_BLACK)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;		&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;terminal_setcolor&lt;&#x2F;span&gt;&lt;span&gt;(clr)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;		&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;terminal_putchar&lt;&#x2F;span&gt;&lt;span&gt;(data[i])&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;	}
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;void &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;terminal_writestring&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;const char* &lt;&#x2F;span&gt;&lt;span&gt;data) {
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;terminal_write&lt;&#x2F;span&gt;&lt;span&gt;(data&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;strlen&lt;&#x2F;span&gt;&lt;span&gt;(data))&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;extern &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;C&amp;quot; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;void &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;kernel_main&lt;&#x2F;span&gt;&lt;span&gt;() {
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; Initialize terminal interface
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;terminal_initialize&lt;&#x2F;span&gt;&lt;span&gt;()&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;terminal_writestring&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;Hello, kernel World!&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ebcb8b;&quot;&gt;\n&lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;Yooooo New line support baby!!!&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h3 id=&quot;compiling-the-code&quot;&gt;Compiling the code&lt;&#x2F;h3&gt;
+&lt;p&gt;The cross compiler we compiled will now be used to compile this code. To compile it:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;i686-elf-g++&lt;&#x2F;span&gt;&lt;span&gt; -c kernel.cpp -o kernel.o -ffreestanding -02 -wall -fno-exceptions -fno-rtti
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h2 id=&quot;assembly&quot;&gt;Assembly&lt;&#x2F;h2&gt;
+&lt;p&gt;We are now going to write an assembly code that serves as a entry point for the kernel by initializing some stuff.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;multiboot-section&quot;&gt;multiboot section&lt;&#x2F;h3&gt;
+&lt;pre data-lang=&quot;asm&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-asm &quot;&gt;&lt;code class=&quot;language-asm&quot; data-lang=&quot;asm&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;.set ALIGN&lt;&#x2F;span&gt;&lt;span&gt;, 1&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;&amp;lt;&amp;lt;&lt;&#x2F;span&gt;&lt;span&gt;0
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;.set MEMINFO&lt;&#x2F;span&gt;&lt;span&gt;, 1&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;&amp;lt;&amp;lt;&lt;&#x2F;span&gt;&lt;span&gt;1
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;.set &lt;&#x2F;span&gt;&lt;span&gt;FLAGS, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;ALIGN | MEMINFO
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;.set MAGIC&lt;&#x2F;span&gt;&lt;span&gt;, 0x1BADB002
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;.set CHECKSUM&lt;&#x2F;span&gt;&lt;span&gt;, -&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;(MAGIC &lt;&#x2F;span&gt;&lt;span&gt;+ FLAGS&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;.section .multiboot
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;.align &lt;&#x2F;span&gt;&lt;span&gt;4
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;.long MAGIC
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;.long &lt;&#x2F;span&gt;&lt;span&gt;FLAGS
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;.long CHECKSUM
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;we are defining some constants used in multiboot header and then defining multiboot section and populating with necessary values. The above code helps bootloader to confirm our kernel as multiboot compliant and validate headers integrity. This is done as per multiboot specification.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;bss-section&quot;&gt;bss section&lt;&#x2F;h3&gt;
+&lt;pre data-lang=&quot;asm&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-asm &quot;&gt;&lt;code class=&quot;language-asm&quot; data-lang=&quot;asm&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;.section .bss
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;.align &lt;&#x2F;span&gt;&lt;span&gt;16
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;stack_bottom:
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;.skip &lt;&#x2F;span&gt;&lt;span&gt;16384
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;stack_top:
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;the multiboot specification doesn&#x27;t define the value of stack pointer register, so its upto ther kernel to provide a stack. the above code provides a 16KB stack from stack_bottom to stack_top. The align 16 is necessary because the stack on x86 must be 16-byte aligned accordind to System V ABI standrad.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;text-section&quot;&gt;text section&lt;&#x2F;h3&gt;
+&lt;pre data-lang=&quot;asm&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-asm &quot;&gt;&lt;code class=&quot;language-asm&quot; data-lang=&quot;asm&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;.section .text
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;.global _start
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;.type _start&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;@function
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;_start:
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;mov &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;$stack_top&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;%&lt;&#x2F;span&gt;&lt;span&gt;esp
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;call &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;kernel_main
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;cli
+&lt;&#x2F;span&gt;&lt;span&gt;1&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;hlt
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;jmp &lt;&#x2F;span&gt;&lt;span&gt;1b
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;.size _start&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;. &lt;&#x2F;span&gt;&lt;span&gt;- &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;_start
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;It defines the text section which contains executable instruction. We well be defining the _start as the entry point in our linker script. _start sets the stack pointer (%esp) to the top of the stack and then calls the main function of our c++ program. After kernel_main function returns, cli instruction disables the hardware interrupts and hlt and jmp instruction puts the cpu in infinite loop.&lt;&#x2F;p&gt;
+&lt;p&gt;The last line sets the size of the _start symbol to the current location &#x27;.&#x27; minus its start. This is useful when debugging or when you implement call tracing.&lt;&#x2F;p&gt;
+&lt;p&gt;save the above code in boot.s file and the assemble it as:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;i686-elf-as&lt;&#x2F;span&gt;&lt;span&gt; boot.s -o boot.o
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h2 id=&quot;linking-the-kernel&quot;&gt;Linking the kernel&lt;&#x2F;h2&gt;
+&lt;p&gt;We now have seperate boot and kernel object files which we need to link to make a final kernel which can be used by bootloader. The default linker scripts is not suitable for this so we will write our own linker script.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;ld&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-ld &quot;&gt;&lt;code class=&quot;language-ld&quot; data-lang=&quot;ld&quot;&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;*defines the _start function as entry point into our kernel_*&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;ENTRY&lt;&#x2F;span&gt;&lt;span&gt;(_start)
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;*defines the sections and their location*&#x2F;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;SECTIONS&lt;&#x2F;span&gt;&lt;span&gt; {
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;*current memory location at 1 MB. conventional place for bootloader 
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;	to load kernel*&#x2F; 
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span&gt; = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;1M&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;*defines the code section of the program. should be aligned to a 4K boundary and that it should be split into blocks of 4K. multiboot section should be first otherwise bootloader won&amp;#39;t recognize the file format.
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;    .text BLOCK(4K) : ALIGN(4K)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;	{
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;		*(.multiboot)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;		*(.text)
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;	}
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;    &#x2F;* Read-only data. *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;	.rodata &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;BLOCK&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;4K&lt;&#x2F;span&gt;&lt;span&gt;) : &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;ALIGN&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;4K&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;	{
+&lt;&#x2F;span&gt;&lt;span&gt;		*(.rodata)
+&lt;&#x2F;span&gt;&lt;span&gt;	}
+&lt;&#x2F;span&gt;&lt;span&gt; 
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;* Read-write data (initialized) *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;	.data &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;BLOCK&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;4K&lt;&#x2F;span&gt;&lt;span&gt;) : &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;ALIGN&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;4K&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;	{
+&lt;&#x2F;span&gt;&lt;span&gt;		*(.data)
+&lt;&#x2F;span&gt;&lt;span&gt;	}
+&lt;&#x2F;span&gt;&lt;span&gt; 
+&lt;&#x2F;span&gt;&lt;span&gt;	&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;* Read-write data (uninitialized) and stack *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;    .bss &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;BLOCK&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;4K&lt;&#x2F;span&gt;&lt;span&gt;) : &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;ALIGN&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b48ead;&quot;&gt;4K&lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;	{
+&lt;&#x2F;span&gt;&lt;span&gt;		*(COMMON)
+&lt;&#x2F;span&gt;&lt;span&gt;		*(.bss)
+&lt;&#x2F;span&gt;&lt;span&gt;	}
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;to link the kernel we do:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;i686-elf-gcc&lt;&#x2F;span&gt;&lt;span&gt; -T linker.ld -o myos.bin -ffreestanding -02 -nostdlib boot.o kernel.o -lgcc
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h2 id=&quot;running-the-kernel&quot;&gt;Running the kernel&lt;&#x2F;h2&gt;
+&lt;p&gt;to run the kernel on qemu:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;bash&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-bash &quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;qemu-system-i386&lt;&#x2F;span&gt;&lt;span&gt; -kernel myos.bin
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;img src=&quot;&#x2F;res&#x2F;blogs&#x2F;Screenshot_2023-06-15_13-42-21.png&quot;&gt;</content>
+	</entry>
 	<entry xml:lang="en">
 		<title>First Step</title>
 		<published>2023-06-14T00:00:00+00:00</published>
