@@ -100,9 +100,10 @@ add this to the .bashrc&lt;&#x2F;li&gt;
 &lt;tr&gt;&lt;td&gt;light brown&lt;&#x2F;td&gt;&lt;td&gt;14&lt;&#x2F;td&gt;&lt;td&gt;1110&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
 &lt;tr&gt;&lt;td&gt;white&lt;&#x2F;td&gt;&lt;td&gt;15&lt;&#x2F;td&gt;&lt;td&gt;1111&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
 &lt;&#x2F;tbody&gt;&lt;&#x2F;table&gt;
-&lt;p&gt;so if you want to print white coloured &#x27;H&#x27; on black background you would have to write this 16 bit sequence at the appropriate buffer index.
-0 0 0 0  |  1 1 1 1  |  0 1 0 0 1 0 0 0
-Black bg  | white fg  | &#x27;H&#x27; ascii 72&lt;&#x2F;p&gt;
+&lt;p&gt;so if you want to print white coloured &#x27;H&#x27; on black background you would have to write this 16 bit sequence at the appropriate buffer index.&lt;&#x2F;p&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Black bg&lt;&#x2F;th&gt;&lt;th&gt;white fg&lt;&#x2F;th&gt;&lt;th&gt;&#x27;H&#x27; ascii 72&lt;&#x2F;th&gt;&lt;&#x2F;tr&gt;&lt;&#x2F;thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;0 0 0 0&lt;&#x2F;td&gt;&lt;td&gt;1 1 1 1&lt;&#x2F;td&gt;&lt;td&gt;0 1 0 0 1 0 0 0&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;&#x2F;tbody&gt;&lt;&#x2F;table&gt;
 &lt;p&gt;with this knowledge lets write a kernel that prints hello world on screen.&lt;&#x2F;p&gt;
 &lt;pre data-lang=&quot;cpp&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-cpp &quot;&gt;&lt;code class=&quot;language-cpp&quot; data-lang=&quot;cpp&quot;&gt;&lt;span style=&quot;color:#5e81ac;&quot;&gt;#include &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;lt;stdint.h&amp;gt; &lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; stuff like size_t, uint8_t etc
 &lt;&#x2F;span&gt;&lt;span style=&quot;color:#5e81ac;&quot;&gt;#include &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;lt;stddef.h&amp;gt;

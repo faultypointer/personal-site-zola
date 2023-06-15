@@ -89,6 +89,7 @@ In VGA text mode, the screen is divided into a rectangular grid of fixed-size ch
 
 Each screen character is represented by 16 bits accessible by the cpu. The 8 least significant bits are character bits that represent ascii character, 9th to 12th bits are for foreground color and rest of the bits are for background color. Depending on the mode setup, the most significant bit might be blink bit.
 
+
 |Background      |Foreground      | Character           |
 |----------------|----------------|---------------------|
 |   0  0  0  0   |   0  0  0  0   |  0 0 0 0 0 0 0 0    |
@@ -116,8 +117,10 @@ Each screen character is represented by 16 bits accessible by the cpu. The 8 lea
 |white|15|1111|
 
 so if you want to print white coloured 'H' on black background you would have to write this 16 bit sequence at the appropriate buffer index.
-			0 0 0 0  |  1 1 1 1  |  0 1 0 0 1 0 0 0
-		   Black bg  | white fg  | 'H' ascii 72
+
+|Black bg  | white fg  | 'H' ascii 72      |
+|----------|-----------|-------------------|
+| 0 0 0 0  |  1 1 1 1  |  0 1 0 0 1 0 0 0  |
 
 with this knowledge lets write a kernel that prints hello world on screen.
 
