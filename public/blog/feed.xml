@@ -4,8 +4,29 @@
 	<subtitle>My blog page</subtitle>
 	<link href="https://faultypointer.netlify.app/blog/feed.xml" rel="self" type="application/atom+xml"/>
     <link href="https://faultypointer.netlify.app/blog/"/>
-	<updated>2023-06-17T00:00:00+00:00</updated>
+	<updated>2023-06-21T00:00:00+00:00</updated>
 	<id>https://faultypointer.netlify.app/blog/feed.xml</id>
+	<entry xml:lang="en">
+		<title>On a quest to understand Basics of Operating System - OS Concepts</title>
+		<published>2023-06-21T00:00:00+00:00</published>
+		<updated>2023-06-21T00:00:00+00:00</updated>
+		<link href="https://faultypointer.netlify.app/blog/jttcoos-basics-of-os-concepts/" type="text/html"/>
+		<id>https://faultypointer.netlify.app/blog/jttcoos-basics-of-os-concepts/</id>
+		<content type="html">&lt;p&gt;In the first part of this blog series, we delved into the hardware components closely tied to operating systems. Now, let&#x27;s shift our focus to the fundamental concepts that form the core of an operating system: processes, files, I&#x2F;O, the shell, and system calls. Understanding these concepts will provide us with a deeper insight into how the operating system manages resources and enables efficient communication between the user and the hardware.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;processes&quot;&gt;Processes&lt;&#x2F;h2&gt;
+&lt;p&gt;A process is basically an instance of a program in execution. Each process has its &lt;strong&gt;address space&lt;&#x2F;strong&gt;, which is a list of memory locations that contains the executable program, program&#x27;s data and its stack. The OS assigns each process a process ID (PID), manages its memory allocation, and handles its scheduling to use CPU time. The OS also handles process creation, termination, creation of child processes, and inter-process communication. The OS maintains info about each process&#x27;s state (running, waiting, etc.), priority, resources used, and user ID.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;files&quot;&gt;Files&lt;&#x2F;h2&gt;
+&lt;p&gt;Files serve as a means of storing and organizing data on secondary storage devices, such as hard drives. The operating system provides a file system that manages files, allowing users and programs to create, read, write, and delete files. A file system organizes data into directories or folders, providing a hierarchical structure for easy navigation and management. The operating system also ensures file security by implementing access control mechanisms, allowing only authorized users to access or modify files.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;i-o-management&quot;&gt;I&#x2F;O Management&lt;&#x2F;h2&gt;
+&lt;p&gt;Input&#x2F;Output (I&#x2F;O) management is a crucial aspect of any operating system. It enables the transfer of data between the computer and its peripheral devices, such as keyboards, mice, displays, and printers. The operating system abstracts the complexities of different devices and provides a unified interface for I&#x2F;O operations. Device drivers, mentioned earlier, play a vital role in facilitating communication between the operating system and the devices, handling data transfers, and managing interrupts.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;the-shell&quot;&gt;The Shell&lt;&#x2F;h2&gt;
+&lt;p&gt;The shell acts as a command interpreter, serving as the interface between the user and the operating system. It provides a command-line or graphical interface through which users can interact with the system. The shell allows users to execute commands, run programs, navigate the file system, and manipulate files. Additionally, it supports features like scripting, batch processing, and job control, providing flexibility and automation capabilities to users.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;system-calls&quot;&gt;System Calls&lt;&#x2F;h2&gt;
+&lt;p&gt;System calls are the primary means by which user programs request services from the operating system. They act as an interface between user space and kernel space, allowing user programs to access privileged operations and interact with hardware resources. System calls provide functionalities such as process creation, file management, network communication, and device access. Examples of system calls include opening or closing a file, reading from or writing to a file, creating a new process, and allocating memory.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;&#x2F;h2&gt;
+&lt;p&gt;Operating systems are complex entities that manage hardware resources and provide essential services to users and applications. By exploring concepts like processes, files, I&#x2F;O management, the shell, and system calls, we gain a deeper understanding of how the operating system orchestrates these components to deliver a seamless computing experience.&lt;&#x2F;p&gt;
+</content>
+	</entry>
 	<entry xml:lang="en">
 		<title>On a quest to understand Basics of Operating System - The Hardware</title>
 		<published>2023-06-17T00:00:00+00:00</published>
