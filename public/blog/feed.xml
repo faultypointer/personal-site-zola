@@ -4,8 +4,50 @@
 	<subtitle>My blog page</subtitle>
 	<link href="https://faultypointer.netlify.app/blog/feed.xml" rel="self" type="application/atom+xml"/>
     <link href="https://faultypointer.netlify.app/blog/"/>
-	<updated>2023-06-15T00:00:00+00:00</updated>
+	<updated>2023-06-17T00:00:00+00:00</updated>
 	<id>https://faultypointer.netlify.app/blog/feed.xml</id>
+	<entry xml:lang="en">
+		<title>On a quest to understand Basics of Operating System - The Hardware</title>
+		<published>2023-06-17T00:00:00+00:00</published>
+		<updated>2023-06-17T00:00:00+00:00</updated>
+		<link href="https://faultypointer.netlify.app/blog/jttcoos-basics-of-os-hardware/" type="text/html"/>
+		<id>https://faultypointer.netlify.app/blog/jttcoos-basics-of-os-hardware/</id>
+		<content type="html">&lt;p&gt;Since operating system is closely tied to the hardware of the computer it operates upon, understanding the underlying hardware makes it a bit easy to understand the workings of operating system. So let us start reviewing the various components of computer hardware in brief&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;processors&quot;&gt;Processors&lt;&#x2F;h2&gt;
+&lt;p&gt;Processors serve as the central processing unit (CPU) and act as the brain of the computer. They function in a continuous cycle, where they retrieve instructions from the memory, decode and execute them, and move on to the next instruction. Processors contain registers that store essential variables and temporary results. Additionally, they possess special registers that play distinct roles:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Program Counter: Holds the memory address of the next instruction to be fetched.&lt;&#x2F;li&gt;
+&lt;li&gt;Stack Pointer: Indicates the top of the current stack in memory.&lt;&#x2F;li&gt;
+&lt;li&gt;Program Status Word: Contains condition code bits.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;Modern computers employ a pipeline model, enabling the execution of multiple instructions simultaneously.&lt;&#x2F;p&gt;
+&lt;p&gt;Another critical aspect of modern operating systems is the presence of two modes in which programs run: kernel mode and user mode. In kernel mode, the processor can utilize all hardware features and execute every instruction in the instruction set. On the other hand, user mode imposes restrictions on certain instructions and allows only a subset of instructions to be executed. Programs running in user mode must make a &lt;em&gt;system call&lt;&#x2F;em&gt; to obtain services from the operating system.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;memory-storing-and-accessing-data&quot;&gt;Memory: Storing and Accessing Data&lt;&#x2F;h2&gt;
+&lt;p&gt;The memory of a computer system is constructed in a hierarchical manner, with each layer possessing varying characteristics in terms of speed, capacity, and cost per bit.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;registers-the-fastest-memory-layer&quot;&gt;Registers: The Fastest Memory Layer&lt;&#x2F;h3&gt;
+&lt;p&gt;Registers represent the top layer of the computer memory hierarchy. Composed of the same material as the CPU, registers offer lightning-fast access. Typically, registers have a storage capacity of less than 1 KiB.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;cache-bridging-the-gap&quot;&gt;Cache: Bridging the Gap&lt;&#x2F;h3&gt;
+&lt;p&gt;Cache serves as the second layer of the memory hierarchy. Modern CPUs have two levels of cache. L1 cache resides inside the CPU and feeds instructions to the CPU. L2 cache retains recently used memory words, ensuring swift access.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;ram-main-memory&quot;&gt;RAM: Main Memory&lt;&#x2F;h3&gt;
+&lt;p&gt;The next layer in the memory hierarchy is the main memory or Random Access Memory (RAM). All data requests that cannot be fulfilled by the cache are directed to the main memory.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;i-o-devices&quot;&gt;I&#x2F;O Devices&lt;&#x2F;h2&gt;
+&lt;p&gt;Operating systems extensively interact with input&#x2F;output (I&#x2F;O) devices. These devices generally consist of two components: a controller and the device itself. The controller is a chip that physically manages the device and provides a simplified interface to the operating system. The software responsible for communicating with the controller is known as a device driver.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;buses&quot;&gt;Buses&lt;&#x2F;h2&gt;
+&lt;p&gt;Buses serve as communication pathways, connecting different hardware components within the computer. They facilitate the exchange of data and instructions between the CPU, memory, and I&#x2F;O devices. Several types of buses are found in a computer system:&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;system-bus&quot;&gt;System Bus&lt;&#x2F;h3&gt;
+&lt;p&gt;The system bus, also referred to as the front-side bus or memory bus, facilitates the transfer of data between the CPU and the main memory. It carries memory addresses, data, and control signals. The width of the system bus determines the volume of data transferred in a single bus cycle.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;i-o-bus&quot;&gt;I&#x2F;O Bus&lt;&#x2F;h3&gt;
+&lt;p&gt;The I&#x2F;O bus, known as the peripheral bus or expansion bus, establishes the connection between the CPU and various I&#x2F;O devices such as hard drives, graphics cards, network cards, and USB devices. Different types of I&#x2F;O buses, such as PCI (Peripheral Component Interconnect) and USB (Universal Serial Bus), feature their own specifications and speeds.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;control-bus&quot;&gt;Control Bus&lt;&#x2F;h3&gt;
+&lt;p&gt;The control bus transmits control signals between the CPU and other hardware components. These signals include read and write signals to indicate data transfer operations, interrupt signals to request attention from the CPU, and clock signals to synchronize the operations of different components.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;address-bus&quot;&gt;Address Bus&lt;&#x2F;h3&gt;
+&lt;p&gt;The address bus carries memory addresses from the CPU to the main memory or I&#x2F;O devices. It determines the location in memory where data needs to be read from or written to. The width of the address bus determines the maximum addressable memory.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;data-bus&quot;&gt;Data Bus&lt;&#x2F;h3&gt;
+&lt;p&gt;The data bus transfers actual data between the CPU, memory, and I&#x2F;O devices. It conveys the data being read from or written to memory or I&#x2F;O devices. The width of the data bus determines the number of bits that can be transferred in a single bus cycle.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;&#x2F;h2&gt;
+&lt;p&gt;A solid understanding of computer hardware is crucial for comprehending the inner workings of an operating system. Processors, memory, I&#x2F;O devices, and buses are integral components that collaborate with the operating system to execute instructions, store and retrieve data, and facilitate seamless communication between different hardware elements. By grasping these hardware concepts, we can gain a clearer understanding of how the operating system interacts with the underlying hardware to provide a smooth computing experience.&lt;&#x2F;p&gt;
+</content>
+	</entry>
 	<entry xml:lang="en">
 		<title>Building A Hello World Kernel</title>
 		<published>2023-06-15T00:00:00+00:00</published>
